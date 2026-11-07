@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "oxc", "import"],
+  "env": { "browser": true, "es2024": true },
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    ".venv*"
+  ],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/jsx-key": "error",
+    "react/no-children-prop": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "no-unused-vars": "error",
+    "no-undef": "error",
+    "eqeqeq": ["error", "smart"],
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}

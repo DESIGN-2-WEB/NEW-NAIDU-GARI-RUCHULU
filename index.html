@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Billing POS</title>
+    <!-- Generic on purpose: the restaurant's name, address and phones come
+         from the database (GET /api/settings) once the app starts, and the
+         app sets the tab title from them. -->
+    <meta name="description" content="Restaurant billing and sales analytics." />
+    <meta name="application-name" content="Billing POS" />
+    <!-- Staff portal: kept out of search results (see public/robots.txt). -->
+    <meta name="robots" content="noindex, nofollow" />
+        <meta name="theme-color" content="#F6EBD3" />
+
+        <!-- Apply the saved theme before React loads: no flash. Light is the
+          default; dark only when explicitly chosen. Mirrors
+         src/styles/theme.js. -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var theme = saved === 'dark' ? 'dark' : 'light';
+          document.documentElement.classList.toggle('theme-light', theme === 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) { /* private mode etc. — React applies the fallback */ }
+      })();
+    </script>
+
+    <!-- The portal installs as its own app: link the manifest before the
+         browser reads it. The API builds it from the restaurant settings. -->
+    <script>
+      (function () {
+        var manifest = document.createElement('link');
+        manifest.rel = 'manifest';
+        manifest.href = '/api/manifest.webmanifest';
+        document.head.appendChild(manifest);
+      })();
+    </script>
+
+    <!-- Link previews (WhatsApp, Facebook, X …). The full-address tags og:url
+         and og:image are added at build time - see linkPreview() in vite.config.js. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Billing POS" />
+    <meta property="og:description" content="Restaurant billing and sales analytics." />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary" />
+
+    <!-- The restaurant logo (see scripts/make_app_icons.py). -->
+    <link rel="icon" href="/favicon.ico?v=2" sizes="48x48" />
+    <link rel="icon" type="image/png" href="/icons/logo-64.png?v=2" sizes="64x64" />
+    <link rel="apple-touch-icon" href="/icons/logo-maskable-512.png?v=2" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <p style="font-family: sans-serif; padding: 2rem; text-align: center">
+        The billing portal needs JavaScript enabled.
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

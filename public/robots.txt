@@ -1,0 +1,5 @@
+# Staff billing portal.
+# Every page carries <meta name="robots" content="noindex, nofollow">, so the
+# portal stays out of search results while link previews still work.
+User-agent: *
+Disallow: /api/
