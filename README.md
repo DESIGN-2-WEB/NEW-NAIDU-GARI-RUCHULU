@@ -22,75 +22,98 @@ Family Restaurant — Old NH5 Road, Kosingpuram Junction, Palasa
 
 ## Contents
 
-- [What it is](#what-it-is)
-- [Screenshots](#screenshots)
-- [Features](#features)
-- [Tech stack](#tech-stack)
-- [Run it on your computer](#run-it-on-your-computer)
-- [Configuration](#configuration)
-- [Deploy to Vercel](#deploy-to-vercel)
-- [Restaurant settings (in the database)](#restaurant-settings-in-the-database)
-- [Staff accounts and passwords](#staff-accounts-and-passwords)
-- [Printer setup (once per counter PC)](#printer-setup-once-per-counter-pc)
-- [Your data: bills and reports](#your-data-bills-and-reports)
-- [Troubleshooting](#troubleshooting)
-- [For developers](#for-developers)
-- [Credits](#credits)
+1. [Overview](#overview)
+2. [Screenshots](#screenshots)
+3. [Features](#features)
+4. [Tech stack](#tech-stack)
+5. [Local development](#local-development)
+6. [Configuration](#configuration)
+7. [Deploy to Vercel](#deploy-to-vercel)
+8. [Restaurant settings](#restaurant-settings)
+9. [Staff accounts](#staff-accounts)
+10. [Printer setup](#printer-setup)
+11. [Bills, reports and backups](#bills-reports-and-backups)
+12. [Troubleshooting](#troubleshooting)
+13. [Development](#development)
+14. [Credits](#credits)
 
 ---
 
-## What it is
+## Overview
 
-A modern, high-speed point-of-sale and counter billing system tailored for New Naidu Gari Ruchulu:
+A point-of-sale and counter billing system for New Naidu Gari Ruchulu. Staff
+sign in, build a bill from the restaurant's menu, and print it on an 80 mm
+thermal printer; the owner follows sales in an analytics dashboard and manages
+the restaurant's details and staff accounts. Everything about the restaurant,
+from its name and menu to its accounts, is kept in the database, not in the
+code.
 
-| Portal | Address | Who signs in | What it is for |
+| Page | Path | Access | Purpose |
 |---|---|---|---|
-| **Billing** | `/billing` | admin, cashier | Make the bill, print thermal receipt, take payment |
-| **Analytics** | `/billing/analytics` | admin | Sales, charts, bill register, Excel report |
-
-Opens at `/billing/login`.
+| Sign-in | `/billing/login` | everyone | Choose an account and sign in |
+| Billing | `/billing` | admin, cashier | Build a bill, print the receipt and token slip |
+| Analytics | `/billing/analytics` | admin | Sales figures, charts, earnings by category, bill register, Excel report |
+| Management | `/billing/management` | admin (cashier: *My account* only) | Restaurant details, staff accounts, own password |
 
 ## Screenshots
 
-<table>
-  <tr>
-    <td width="70%"><img src="docs/screenshots/analytics.jpg" alt="Analytics dashboard with sales cards and charts"><br><sub><b>Analytics</b> — revenue, top items, payment methods and the 7-day trend.</sub></td>
-    <td align="center" width="30%"><img src="docs/screenshots/login-phone.jpg" alt="Login page on a phone" width="260"><br><sub><b>Login</b>, with <i>Install</i> to add the portal as an app</sub></td>
-  </tr>
-</table>
+<img src="docs/screenshots/login.jpg" alt="Login page: the restaurant's details and feature cards on a deep-red panel, the sign-in form on the right">
+<sub><b>Login</b> — owner, address and phones from the settings, the account list, and <i>Install app</i>. Fits one screen on computers and phones.</sub>
 
-<sub>Screens shown with sample bills.</sub>
+<img src="docs/screenshots/analytics.jpg" alt="Analytics dashboard with sales cards and charts">
+<sub><b>Analytics</b> — revenue, top items, payment methods and the 7-day trend.</sub>
+
+<sub>Analytics shown with sample bills.</sub>
 
 ## Features
 
 ### Billing counter
 
+- **The full printed menu** — 187 items in 24 sections in menu order (Idly,
+  Vada & Poori, Dosa, … Biryanis, Pulao & Specials), each with its price and a
+  picture loaded from a web link. Photo cards keep the picture clear with the
+  name and price on a dark band, readable in both themes.
 - **Fast billing** — tap menu items (sizes such as solo / duo / trio / squad
-  where an item has them), set quantities, table, payment (Cash, Card, UPI,
-  Zomato, Swiggy, Pending), order type and a discount %. The **＋** button adds
-  a one-off item.
+  where an item has them), set quantities, table, payment, order type and a
+  discount %. The **＋** button adds a one-off item. **Print** saves the bill
+  (so the slip carries its real number), then opens the print dialog.
 - **Printed bill and token slip** for an **80 mm thermal printer** (e.g. TVS
-  RP3200 Lite): bill number, date and time, items, totals and *"Thank you! 🙏
-  Visit again 🙏"*, then the customer's token slip (items only) on its own page,
+  RP3200 Lite): bill number, date and time, items, totals and the closing lines
+  from the settings (for example *"Thank you! Visit again"*), then the customer's
+  token slip (items only) on its own page,
   so the cutter separates them. Set the printer up once — see
-  [Printer setup](#printer-setup-once-per-counter-pc).
+  [Printer setup](#printer-setup).
+- **Management** (gear menu, its own page) — the admin edits the restaurant's name,
+  tagline, owner, address, phone numbers and an optional **GST number**
+  (printed on every bill as *GSTIN*); adds and deletes staff accounts and sets
+  a new password for anyone who forgot theirs; and changes their own password
+  under **My account**. Cashiers see only *My account*. The admin cannot delete
+  their own account or the last admin.
 - **Menu and categories** (admin) — add, edit and delete items and categories
   from the gear menu; the dialogs stay open for several changes in a row.
+  Categories keep their menu order; a new one goes at the end.
 
 ### Analytics (admin)
 
 - Today / this week / this month / any date or range: revenue, number of bills,
   average bill, busiest hour, top items, payment methods and a 7-day trend.
+- **Earnings by category** — what each menu category earned in the period
+  (after bill discounts, so the categories add up to revenue), its share,
+  items sold and bills. Bills record each item's category; older bills are
+  matched to today's menu by item name.
 - **Bill register** with search, and **Manage bill → Print bill** (reprint any
   saved bill) or **Permanently delete bills**.
 - **Excel sales report** for any date range — six sheets: Summary, Daily Sales,
   Payment Methods, Order Types, Item Sales and the full Bill Register, in a
   plain printable ledger style.
 
-### Everywhere
+### Across the app
 
 - **Works on phones, tablets and computers** (from small phones to large
   counter screens).
+- **Login page** — the restaurant's name, owner, address and phones beside the
+  sign-in form, with the account last used on that device preselected. It fits
+  one screen with no scrolling, on computers and phones.
 - **Install as an app** — the login page has an *Install* button that installs
   the portal with the restaurant logo. It disappears once installed.
 - **Dark and light theme** (gear menu → Theme).
@@ -99,14 +122,14 @@ Opens at `/billing/login`.
 
 | Part | Built with |
 |---|---|
-| Web app | React 19, React Router 7, Vite 8, Chart.js 4, Axios; Inter font bundled |
+| Web app | React 19, React Router 7, Vite 8, Chart.js 4, Axios, Lucide icons; Inter and Playfair Display fonts bundled |
 | API | Python 3.12+, Flask 3, Flask-JWT-Extended (sign-in tokens), Flask-CORS, bcrypt |
 | Database | MongoDB Atlas (PyMongo) |
 | Reports | openpyxl (Excel) |
 | Hosting | Vercel — pages plus the API as a Python function |
 | Installable app | A web app manifest + a small service worker |
 
-## Run it on your computer
+## Local development
 
 **You need:** Node.js 20.19+ (or 22.12+), Python 3.12+, and a MongoDB Atlas
 database.
@@ -123,8 +146,8 @@ database.
    `.env` holds secrets and is never uploaded.
 
 3. **Restaurant and accounts** — on a new database, enter the restaurant
-   settings ([how](#restaurant-settings-in-the-database)) and create the staff
-   accounts with their passwords ([how](#staff-accounts-and-passwords)).
+   settings ([how](#restaurant-settings)) and create the staff
+   accounts with their passwords ([how](#staff-accounts)).
    Nothing is created from the code.
 
 4. **Start** — two terminals:
@@ -208,7 +231,7 @@ time they are opened.
 - After a quiet spell the first request takes 1–3 seconds longer while Vercel
   wakes the API up.
 
-## Restaurant settings (in the database)
+## Restaurant settings
 
 Nothing about the restaurant is written in the code. One document in the
 database (collection `settings`) holds everything the screens, bills and the
@@ -220,8 +243,9 @@ Excel report show, and the app loads it when it opens:
 | `title` | Name in browser tabs, the installed app and the Excel report |
 | `shortName` | Short name under the installed app's icon |
 | `tagline` | Line under the name, e.g. *Family Restaurant* |
-| `location`, `owner` | Shown in the billing header |
+| `location`, `owner` | The address and owner, shown on the login page and in the billing header |
 | `phones` | Contact numbers printed on bills |
+| `gstNumber` | GSTIN printed on bills (optional) |
 | `credit` | Footer line |
 | `receiptFooter` | Lines printed at the bottom of every bill (the first one large), e.g. `"Thank you!" "Visit again"` |
 | `loginHeadline` | Login page headline, one value per line; `*stars*` highlight words, e.g. `"Every order," "*perfectly* billed."` |
@@ -232,7 +256,9 @@ Excel report show, and the app loads it when it opens:
 | `sizeOrder` | Order the sizes of a group item are shown in (others follow, cheapest first) |
 | `paymentAliases` | Payment names on older bills counted as another method in reports (e.g. `Cash / UPI` → `Cash`) |
 
-See or change them from the project folder:
+Name, tagline, owner, address, phones and GST number are edited on screen in
+**Management → Restaurant details** (admin). Everything can also be seen or
+changed from the project folder:
 
 ```bash
 python -m server.settings show
@@ -248,7 +274,7 @@ shows on every screen the next time it is opened (the API keeps a copy for up
 to a minute). Staff accounts, categories (and their order) and the menu, with
 its prices and picture links, are in the database too.
 
-## Staff accounts and passwords
+## Staff accounts
 
 | Role | Accounts | Can use |
 |---|---|---|
@@ -256,7 +282,10 @@ its prices and picture links, are in the database too.
 | cashier | 2 | Billing: bills and the menu |
 
 The accounts live only in the database; the login page lists every admin
-and cashier that has a password. To add one:
+and cashier that has a password. The admin manages them on screen in
+**Management → Users** (add, delete, set a new password), and anyone changes
+their own password in **Management → My account** (it asks for the current
+one first). From the project folder, to add one:
 
 ```bash
 python -m server.passwords set <email> --role cashier
@@ -276,7 +305,7 @@ password (never the password itself).
 - There is no limit on wrong password attempts, so use **strong passwords** on
   the live site.
 
-## Printer setup (once per counter PC)
+## Printer setup
 
 The bill prints from the browser, so the **print dialog and the printer's own
 settings** decide the paper. Set them once; Chrome and Edge remember them for
@@ -303,7 +332,7 @@ that printer.
 The print preview always shows the whole paper; whether the blank part is fed
 depends on step 2.
 
-## Your data: bills and reports
+## Bills, reports and backups
 
 ### Bill numbers
 
@@ -324,9 +353,12 @@ Analytics → download → pick the dates. Six sheets: Summary, Daily Sales,
 Payment Methods, Order Types, Item Sales and the full Bill Register — Times New
 Roman, black only, a border on every cell, A4 with page numbers.
 
-### Backups and logs (on the computer only, never uploaded)
+### Backups and logs
 
-- `backups/` — copies of records removed during earlier clean-ups.
+- `backups/` — copies of records taken before a clean-up: `menu-*.json` (the
+  menu before it was rebuilt from the printed menu) and `bills-*.json` (the
+  test bills cleared before the shop started billing). Each is a plain JSON
+  copy of the database records.
 - `logs/` — `api.log` and `web.log` when the servers run in the background;
   deleted bills are recorded there.
 
@@ -339,10 +371,10 @@ Roman, black only, a border on every cell, A4 with page numbers.
 | Changes don't show on the live site | Check Vercel → Deployments for the new build; close and reopen installed apps |
 | No *Install* button | The portal is already installed on this device. On iPhone use Share → *Add to Home Screen* |
 | First screen is slow after a quiet spell | Vercel is waking the API up (1–3 s) |
-| Bill prints with big gaps, the date or the web address | Do the [printer setup](#printer-setup-once-per-counter-pc) once on that PC |
+| Bill prints with big gaps, the date or the web address | Do the [printer setup](#printer-setup) once on that PC |
 | Local app doesn't open after a restart | Start `python app.py` and `npm run dev` again |
 
-## For developers
+## Development
 
 <details>
 <summary><b>Project structure</b></summary>
@@ -361,21 +393,22 @@ server/                    Flask API
   api.py                   response format and @roles_required
   bootstrap.py             database indexes (once; nothing is seeded from the code)
   settings.py              restaurant settings in the database + command line
+  roles.py                 the staff roles (admin, cashier), defined once
   passwords.py             command line: set staff passwords
   security.py              bcrypt password hashing
   validation.py            bill checks; totals are recomputed on the server
   reports.py               the Excel workbook
   timeutil.py              UTC storage, restaurant "today"
-  routes/                  auth, bills, menu, reports, system
+  routes/                  auth, bills, menu, reports, system, users
 
 src/                       React web app
   main.jsx, App.jsx        start-up and the billing routes
   api/                     client.js (Axios + sign-in), session.js (the stored sign-in), index.js (every API call)
-  config/                  settings.js (restaurant settings from the API), portals.js
+  config/                  settings.js (restaurant settings from the API), portals.js, roles.js
   styles/                  index.css (colours, layout, print), components.css, theme.js, typography.js
   hooks/                   useMenu, useCart, useNumberGuard, usePageTitle
-  components/              auth/, layout/, ui/, notifications/, menu/, modals/, receipt/, settings/
-  pages/                   billing/ (+ analytics/)
+  components/              auth/, layout/, ui/, notifications/, menu/, modals/, receipt/, settings/, management/ (the Management sections)
+  pages/                   billing/ (BillingApp routes, BillingDashboard, ManagementPage, analytics/)
   utils/                   format, install, zoom, sizes, download
 
 public/                    icons, favicon, robots.txt, app manifest, service worker
@@ -398,7 +431,7 @@ All responses are JSON: `{ "success": true, … }` or
 | POST | `/api/auth/login` | anyone |
 | GET / POST | `/api/auth/verify`, `/api/auth/logout` | signed in |
 | GET | `/api/auth/accounts` (the login list) | anyone |
-| GET | `/api/custom-items`, `/api/categories` | admin, cashier |
+| GET | `/api/custom-items`, `/api/categories` (in menu order) | admin, cashier |
 | POST | `/api/custom-items` | admin, cashier |
 | PUT / DELETE | `/api/custom-items/<name>` | admin |
 | POST / DELETE | `/api/categories`, `/api/categories/<name>` (deletes its items too) | admin |
@@ -408,6 +441,11 @@ All responses are JSON: `{ "success": true, … }` or
 | DELETE | `/api/bill/<id>/permanent-delete` | admin |
 | GET | `/api/reports/sales.xlsx?from=YYYY-MM-DD&to=YYYY-MM-DD` | admin |
 | GET | `/api/settings` (restaurant settings) | anyone |
+| PUT | `/api/settings` (name, tagline, owner, address, phones, GSTIN) | admin |
+| GET / POST | `/api/users` (list, add an account) | admin |
+| DELETE | `/api/users/<id>` (not yourself, not the last admin) | admin |
+| PUT | `/api/users/<id>/password` (set a new password) | admin |
+| POST | `/api/auth/password` (change your own; needs the current one) | signed in |
 | GET | `/api/manifest.webmanifest` (install-app manifest, named from the settings) | anyone |
 | GET | `/api/health` | anyone |
 
@@ -425,12 +463,16 @@ All responses are JSON: `{ "success": true, … }` or
 - **No `alert()`, `confirm()` or native `<select>`** — messages use
   `useNotify()`, dropdowns use `Select` / `MenuPopup`.
 - **Nothing about the restaurant is in the code** — name, phones, payment
-  methods, order types, tables and size order come from the `settings`
-  document (`server/settings.py`, `src/config/settings.js`); accounts,
-  categories and the menu from their own collections. `index.html` stays
+  methods, order types, tables, size order, the bill's closing lines and the
+  login headline and cards come from the `settings` document
+  (`server/settings.py`, `src/config/settings.js`); accounts, categories (with
+  their `position`) and the menu (with picture links) from their own
+  collections. `index.html` stays
   generic because link previews read it without running the app.
 - **Nothing secret in the code** — passwords only in the database, keys only in
   `.env` / the host.
+- **Roles are defined once** — `server/roles.py` and `src/config/roles.js`;
+  routes use `@roles_required(*ROLES)` / `@roles_required(ADMIN)`.
 - **Colours are CSS variables** (dark on `:root`, light on
   `html[data-theme='light']`).
 - **Popups are drawn above the page and kept on screen** (`MenuPopup`); the
@@ -479,6 +521,8 @@ The full history of changes, fixes and decisions is in
 
 ## Credits
 
-Built for **New Naidu Gari Ruchulu**, Old NH5 Road, Kosingpuram Junction, Palasa.
+Built by D2W for **New Naidu Gari Ruchulu**, Old NH5 Road, Kosingpuram
+Junction, Palasa. Menu photographs are loaded from their web addresses; most
+come from Wikimedia Commons under their own free licences.
 
-© D2W 2026
+© 2026 D2W. All rights reserved.

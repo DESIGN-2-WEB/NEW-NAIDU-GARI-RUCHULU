@@ -9,6 +9,8 @@ recommendation.
 
 **Contents**
 
+- [8 Nov 2026 — Management: restaurant details, users, My account](#8-nov-2026--management-restaurant-details-users-my-account)
+- [5–8 Nov 2026 — New login page, full printed menu, earnings by category, bills cleared](#58-nov-2026--new-login-page-full-printed-menu-earnings-by-category-bills-cleared)
 - [Summary](#summary)
 - [7–8 Sep 2026 — Audit, bug fixes and restructure](#78-sep-2026--audit-bug-fixes-and-restructure)
 - [9 Sep 2026 — Notifications, custom UI, kitchen Done](#9-sep-2026--notifications-custom-ui-kitchen-done)
@@ -23,6 +25,25 @@ recommendation.
 - [How to verify](#how-to-verify)
 
 ---
+
+## 8 Nov 2026 — Management: restaurant details, users, My account
+- **Asked:** a "Management" option in the settings to edit the owner's name, address, phone numbers and an optional GST number; add and delete users; a "My account" option to change passwords; "Address" instead of "Location"; check everything for hard-coded values and make it structured.
+- **Now:** gear menu → **Management** (admin: Restaurant details, Users, My account; cashier: My account only). Restaurant details saves through `PUT /api/settings` (checked: name required, phones 6–15 digits, at most 4, GSTIN in the 15-character format; an empty GST number removes it) and redraws the header and bill at once. The GST number is a new `gstNumber` setting printed on bills as *GSTIN*. Users: `GET/POST /api/users`, `DELETE /api/users/<id>` (never yourself or the last admin), `PUT /api/users/<id>/password`; deleting or resetting takes effect on that user's next request. My account: `POST /api/auth/password` asks for the current password. The billing header says **Address**.
+- **Structure:** roles are defined once (`server/roles.py`, `src/config/roles.js`) instead of in nine files; the + button's `custom` category is one constant; one password rule (`security.password_problem`) serves the command line and the API; the new dialog lives in `src/components/management/`. The search found no restaurant details left in the code. Leftover neon-green colours from the old theme in the shared form styles (placeholder text in every dialog) now use the theme.
+- **Then (same day):** Management became its own page, `/billing/management?section=…`, with a side menu (tabs on phones) and its own styles in the Inter font, following the light and dark theme; the gear menu's Management items open it. The menu dialogs' preview cards (Add item, Edit item, the Delete-item grid) now use the same photo style as the billing menu (shared `cardImageProps`), so their names and prices are readable; Add item reuses the shared item fields (it had its own copy, with a leftover example from another restaurant). Item names keep their own spelling in the item picker; category names are capitalised in the dialogs as on the billing tabs. README rewritten in a more formal tone, without emojis.
+- **Checked:** 30 API checks on a scratch copy of the database, and the dialog end to end (save details with a GST number and a third phone, add / delete an account, change a password) on a throwaway test database with test accounts; both dropped afterwards, live data untouched.
+
+## 5–8 Nov 2026 — New login page, full printed menu, earnings by category, bills cleared
+- **Login page:** split layout — the restaurant's name, owner, address and phones on a deep-red panel with gold linework, the sign-in form beside it (account list with keyboard support, last account on the device preselected, password reveal, Lucide icons, bundled Playfair Display headings). Fits one screen with no scrolling on computers and phones (checked 320×540 to 1366×602). Its headline and feature cards are the new `loginHeadline` / `loginFeatures` settings.
+- **Menu rebuilt from the printed menu (`Restaurant_Menu.pdf`):** 187 items in 24 sections (112 existing items renamed/re-priced, 75 added; Stuffed Mushroom, Paneer Noodles, Tandoori Kababs, a misfiled "Idli" and a test item "hi" deleted on request). Every item has a picture link (55 kept, 132 from Wikimedia Commons, all checked to load). 15 items with no legible price (biryanis, pulao, Mughlai parathas) are at ₹1 until the shop sends prices; prices marked unclear (*) in the PDF were entered as printed. The old menu is in `backups/menu-20261108-145026.json`.
+- **Categories have a `position`:** the API lists them in menu order, new ones go at the end, and the tabs and settings dialogs keep that order (they used to sort A–Z).
+- **Menu cards readable in the light theme:** photo cards keep the picture clear with the name and price on a dark band; the light theme's cream overlay had washed the photo out. Cards now set `data-has-image`, which their styles expected but never got.
+- **Printing:** tried a "Did the bill print?" confirmation and then direct (`--kiosk-printing`) printing; on request both were removed and **Print** is back to save-then-print-dialog, with no separate Save button.
+- **Earnings by category (Analytics):** each menu category's earnings for the selected period after bill discounts (so they add up to revenue), share, items sold and bills. Bills now record each item's `category`; older bills are matched to today's menu by name ("other" if no match).
+- **Bill footer from the settings:** the "Thank you! / Visit again" lines are the `receiptFooter` setting.
+- **Dead code removed:** the old login page's styles, `Tagline.jsx`, an unused animation.
+- **Bills cleared:** the 6 test bills (₹121, 24 Oct and 8 Nov) were deleted on request and the bill counter reset, so the first real bill is #1. Copy in `backups/bills-20261108-151641.json`.
+- **Open:** the README's billing and analytics screenshots predate the new menu and category section; retake them when signed in.
 
 ## 25 Oct 2026 — Everything from the database; nothing about the restaurant in the code
 - **Asked:** nothing hardcoded — no passwords, categories or anything else; everything fetched from the database; check everything twice.
@@ -830,4 +851,4 @@ and `custom_items` collections in its test database (README → Testing).
 npm run lint && npm run build
 ```
 
-Both clean as of 25 Oct 2026.
+Both clean as of 8 Nov 2026.
