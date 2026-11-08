@@ -146,10 +146,37 @@ html[data-theme='light'] .lg-page {
   text-transform: uppercase;
   color: var(--lg-gold);
 }
-.lg-owner {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--lg-gold-soft);
+/* Owner, address and phone: a small labelled list under the name. */
+.lg-details {
+  display: grid;
+  gap: clamp(4px, 1vh, 8px);
+  margin: clamp(4px, 1.2vh, 10px) 0 0;
+  max-width: 460px;
+}
+.lg-detail {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  align-items: baseline;
+  gap: 10px;
+}
+.lg-detail dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--lg-gold);
+}
+.lg-detail dt svg {
+  flex-shrink: 0;
+}
+.lg-detail dd {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--lg-cream);
 }
 
 .lg-hero {
@@ -178,26 +205,6 @@ html[data-theme='light'] .lg-page {
   font-weight: 600;
   color: var(--lg-gold);
 }
-.lg-contact {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(2px, 0.8vh, 6px);
-  margin: 0 0 clamp(10px, 3vh, 26px);
-  font-size: 0.84rem;
-  line-height: 1.5;
-  color: var(--lg-cream-muted);
-}
-.lg-contact span {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-.lg-contact svg {
-  flex-shrink: 0;
-  margin-top: 3px;
-  color: var(--lg-gold);
-}
-
 .lg-features {
   list-style: none;
   margin: 0;
@@ -613,9 +620,8 @@ html[data-theme='light'] .lg-page {
     margin-top: 20px;
   }
 }
-@media (min-width: 901px) and (max-height: 540px) {
-  .lg-contact,
-  .lg-owner {
+@media (min-width: 901px) and (max-height: 560px) {
+  .lg-features {
     display: none;
   }
 }
@@ -669,63 +675,113 @@ html[data-theme='light'] .lg-page {
   }
 }
 
-/* ===== Tablets and phones: brand becomes a compact banner on top ===== */
+/* ===== Tablets and phones: brand becomes a compact banner on top =====
+   Everything is sized from the screen height (vh), so the page fits a short
+   phone without scrolling. */
 @media (max-width: 900px) {
   .lg-page {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
   }
   .lg-brand-inner {
-    padding: 22px 20px 26px;
+    padding: clamp(12px, 2.6vh, 22px) 18px clamp(12px, 2.6vh, 22px);
+    gap: 0;
+  }
+  .lg-identity {
+    gap: 12px;
+    padding-right: 96px; /* room for the Install button */
+  }
+  .lg-logo {
+    width: clamp(38px, 6vh, 48px);
+    height: clamp(38px, 6vh, 48px);
+    border-radius: 12px;
+  }
+  .lg-name {
+    font-size: clamp(0.95rem, 0.8rem + 1vw, 1.15rem);
+  }
+  .lg-details {
+    gap: clamp(2px, 0.6vh, 6px);
+    margin-top: clamp(8px, 1.6vh, 14px);
+  }
+  .lg-detail {
+    grid-template-columns: 84px 1fr;
     gap: 8px;
+  }
+  .lg-detail dt {
+    font-size: 0.62rem;
+    letter-spacing: 1.1px;
+  }
+  .lg-detail dd {
+    font-size: 0.78rem;
+    line-height: 1.35;
   }
   .lg-hero {
     margin: 0;
-    padding: 14px 0 0;
+    padding: clamp(8px, 1.6vh, 14px) 0 0;
+  }
+  .lg-kicker {
+    font-size: 0.66rem;
+    letter-spacing: 2.4px;
   }
   .lg-headline {
-    margin: 8px 0 0;
-    font-size: clamp(1.55rem, 1.1rem + 2.2vw, 2rem);
+    margin: 4px 0 0;
+    font-size: min(clamp(1.4rem, 1rem + 2.2vw, 1.9rem), 4.2vh);
   }
-  .lg-contact,
   .lg-features,
   .lg-credit {
     display: none;
   }
+  .lg-rosette-a {
+    width: 150px;
+    height: 150px;
+  }
   .lg-rosette-b {
-    width: 360px;
-    height: 360px;
-    right: -120px;
-    bottom: -180px;
+    width: 320px;
+    height: 320px;
+    right: -110px;
+    bottom: -170px;
   }
-  .lg-main {
-    padding: clamp(52px, 8vh, 64px) 20px clamp(16px, 3vh, 32px);
-  }
+
+  /* Install sits at the top right of the red banner. */
   .lg-install {
-    top: 12px;
+    position: fixed;
+    z-index: 30;
+    top: clamp(10px, 2.2vh, 18px);
     right: 14px;
   }
+  .lg-main {
+    align-items: center;
+    padding: clamp(14px, 3.4vh, 36px) 20px clamp(12px, 2.4vh, 28px);
+  }
+  .lg-title {
+    font-size: clamp(1.5rem, 1.2rem + 1.4vw, 1.9rem);
+  }
   .lg-subtitle {
-    margin-bottom: clamp(16px, 3vh, 26px);
+    margin: 4px 0 clamp(12px, 2.6vh, 24px);
+    font-size: 0.86rem;
+  }
+  .lg-label {
+    margin-bottom: 6px;
+    font-size: 0.66rem;
   }
   .lg-field {
-    margin-bottom: clamp(12px, 2vh, 20px);
+    margin-bottom: clamp(10px, 2vh, 18px);
+  }
+  .lg-control {
+    min-height: clamp(44px, 6.6vh, 50px);
+  }
+  .lg-password input {
+    height: clamp(42px, 6.4vh, 48px);
   }
   .lg-submit {
-    margin-top: clamp(16px, 3vh, 30px);
+    height: clamp(44px, 6.8vh, 52px);
+    margin-top: clamp(14px, 2.8vh, 28px);
   }
 }
 
-@media (max-width: 420px) {
-  .lg-logo {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-  }
-  .lg-owner {
-    font-size: 0.76rem;
-  }
-  .lg-kicker {
-    letter-spacing: 2.4px;
+/* Short phones: the headline gives way to the form. */
+@media (max-width: 900px) and (max-height: 700px) {
+  .lg-hero {
+    display: none;
   }
 }

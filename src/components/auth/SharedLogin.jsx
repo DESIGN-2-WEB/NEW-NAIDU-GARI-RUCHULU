@@ -198,9 +198,26 @@ export default function SharedLogin({ portal, targetRole, helperText }) {
               {RESTAURANT.tagline && <div className="lg-tagline">{RESTAURANT.tagline}</div>}
             </div>
           </div>
-          {RESTAURANT.owner && (
-            <div className="lg-owner lg-reveal" style={{ '--d': 1 }}>Owner: {RESTAURANT.owner}</div>
-          )}
+          <dl className="lg-details lg-reveal" style={{ '--d': 1 }}>
+            {RESTAURANT.owner && (
+              <div className="lg-detail">
+                <dt><User size={13} aria-hidden="true" />Owner</dt>
+                <dd>{RESTAURANT.owner}</dd>
+              </div>
+            )}
+            {RESTAURANT.location && (
+              <div className="lg-detail">
+                <dt><MapPin size={13} aria-hidden="true" />Address</dt>
+                <dd>{RESTAURANT.location}</dd>
+              </div>
+            )}
+            {phones.length > 0 && (
+              <div className="lg-detail">
+                <dt><Phone size={13} aria-hidden="true" />Phone</dt>
+                <dd>{phones.join(' / ')}</dd>
+              </div>
+            )}
+          </dl>
 
           <div className="lg-hero">
             <div className="lg-kicker lg-reveal" style={{ '--d': 2 }}>{portal.name}</div>
@@ -208,16 +225,6 @@ export default function SharedLogin({ portal, targetRole, helperText }) {
               Every order,<br />
               <em>perfectly</em> billed.
             </h1>
-            {(RESTAURANT.location || phones.length > 0) && (
-              <p className="lg-contact lg-reveal" style={{ '--d': 4 }}>
-                {RESTAURANT.location && (
-                  <span><MapPin size={14} aria-hidden="true" />{RESTAURANT.location}</span>
-                )}
-                {phones.length > 0 && (
-                  <span><Phone size={14} aria-hidden="true" />{phones.join(' / ')}</span>
-                )}
-              </p>
-            )}
 
             <ul className="lg-features">
               {FEATURES.map(({ icon: Icon, title, text }, i) => (
