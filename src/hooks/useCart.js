@@ -11,12 +11,16 @@ import { useCallback, useMemo, useState } from 'react';
 export default function useCart() {
   const [items, setItems] = useState({});
 
-  const addItem = useCallback((name, price) => {
+  // `category` is the menu category the item came from; the bill records it
+  // so the analytics page can total earnings per category.
+  const addItem = useCallback((name, price, category) => {
     setItems((prev) => {
       const existing = prev[name];
       return {
         ...prev,
-        [name]: existing ? { ...existing, qty: existing.qty + 1 } : { price: Number(price) || 0, qty: 1 },
+        [name]: existing
+          ? { ...existing, qty: existing.qty + 1 }
+          : { price: Number(price) || 0, qty: 1, category: category || '' },
       };
     });
   }, []);
@@ -50,7 +54,7 @@ export default function useCart() {
       const qty = Number(item.qty) || 1;
       next[name] = next[name]
         ? { ...next[name], qty: next[name].qty + qty }
-        : { price: Number(item.price) || 0, qty };
+        : { price: Number(item.price) || 0, qty, category: item.category || '' };
     });
     setItems(next);
   }, []);
@@ -61,7 +65,12 @@ export default function useCart() {
     [entries],
   );
   const lines = useMemo(
-    () => entries.map(([name, item]) => ({ name, price: item.price, qty: item.qty })),
+    () => entries.map(([name, item]) => ({
+      name,
+      price: item.price,
+      qty: item.qty,
+      ...(item.category ? { category: item.category } : {}),
+    })),
     [entries],
   );
 

@@ -6,7 +6,7 @@ MAX_ITEMS_PER_BILL = 200
 
 
 def clean_items(raw) -> tuple[list | None, str]:
-    """Normalize a cart into ``[{name, price, qty}]`` or return an error message."""
+    """Normalize a cart into ``[{name, price, qty, category?}]`` or return an error message."""
     if not isinstance(raw, list):
         return None, "Items must be an array"
     if not raw:
@@ -30,7 +30,12 @@ def clean_items(raw) -> tuple[list | None, str]:
             return None, f"Price cannot be negative for {name!r}"
         if qty <= 0:
             return None, f"Quantity must be at least 1 for {name!r}"
-        items.append({"name": name, "price": price, "qty": qty})
+        line = {"name": name, "price": price, "qty": qty}
+        # The menu category the item came from, for earnings per category.
+        category = str(entry.get("category") or "").strip().lower()[:60]
+        if category:
+            line["category"] = category
+        items.append(line)
     return items, ""
 
 

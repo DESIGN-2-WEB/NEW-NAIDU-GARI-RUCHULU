@@ -52,7 +52,7 @@ export default function BillingDashboard() {
 
   const selectItem = useCallback((item) => {
     if (!item.isGroup) {
-      cart.addItem(item.name, item.price || 0);
+      cart.addItem(item.name, item.price || 0, item.category);
       return;
     }
     // A group with no priced size has nothing to put on the bill; the click
@@ -73,14 +73,13 @@ export default function BillingDashboard() {
     setDiscount(0);
   }, [cart]);
 
-  // Record the bill, and print it when asked. Printing goes straight to the
-  // thermal printer (the counter's browser runs with --kiosk-printing, see
-  // README), so there is no print dialog to cancel: a printed bill is a sold
-  // bill. It is saved first so the slip carries its real bill number.
-  const commitBill = useCallback(async (print) => {
+  const printBill = useCallback(async () => {
     if (!canPrint || saving) return;
     setSaving(true);
+
     try {
+      // Save first: a bill that printed but was never recorded is the one
+      // failure mode the cashier cannot recover from at the counter.
       const result = await saveBill({
         items: cart.lines,
         payment,
@@ -88,15 +87,16 @@ export default function BillingDashboard() {
         tableNo,
         discount: discountPercent,
       });
-      if (print) {
-        setBillNumber(result.billNumber);
-        setPrintedAt(new Date());
-        // Let React paint the final number and time before printing them.
-        await new Promise((resolve) => setTimeout(resolve, 60));
-        window.print();
-      }
-      const amount = rupees(result.bill?.total ?? total);
-      notify(`Bill #${result.billNumber} ${print ? 'printed and saved' : 'saved'} — ${amount}`, 'success');
+
+      setBillNumber(result.billNumber);
+      setPrintedAt(new Date());
+
+      // Let React paint the final number before the print dialog snapshots it.
+      await new Promise((resolve) => setTimeout(resolve, 60));
+      window.print();
+
+      notify(`Bill #${result.billNumber} printed — ${rupees(result.bill?.total ?? total)}`, 'success');
+
       reset();
       setPrintedAt(null);
       refreshBillNumber();
@@ -237,11 +237,8 @@ export default function BillingDashboard() {
         </div>
 
         <div className="actions no-print">
-          <button type="button" className="print" onClick={() => commitBill(true)} disabled={!canPrint || saving}>
+          <button type="button" className="print" onClick={printBill} disabled={!canPrint || saving}>
             {saving ? 'Saving…' : 'Print'}
-          </button>
-          <button type="button" className="save-bill" onClick={() => commitBill(false)} disabled={!canPrint || saving}>
-            Save
           </button>
           <button type="button" className="clear" onClick={reset} disabled={cart.isEmpty}>
             Clear
@@ -289,7 +286,7 @@ export default function BillingDashboard() {
           item={sizeItem}
           onClose={() => setSizeItem(null)}
           onSelect={(name, price) => {
-            cart.addItem(name, price);
+            cart.addItem(name, price, sizeItem.category);
             setSizeItem(null);
           }}
         />
@@ -299,7 +296,7 @@ export default function BillingDashboard() {
         <AddCustomItemModal
           onClose={() => setShowCustomItem(false)}
           onAdded={(name, price) => {
-            cart.addItem(name, price);
+            cart.addItem(name, price, 'custom');
             menu.reload();
           }}
         />

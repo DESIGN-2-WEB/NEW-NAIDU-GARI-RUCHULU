@@ -274,52 +274,30 @@ password (never the password itself).
 
 ## Printer setup (once per counter PC)
 
-**Print** saves the bill and prints it straight away, with no print dialog, so
-a bill can never be printed-then-cancelled or saved without printing by
-mistake. For that the counter's browser must print directly:
+The bill prints from the browser, so the **print dialog and the printer's own
+settings** decide the paper. Set them once; Chrome and Edge remember them for
+that printer.
 
-1. **Print directly (required).** Make a shortcut that opens the billing page
-   with direct printing:
-   - Right-click the desktop → **New → Shortcut**.
-   - For the location, enter one line. Chrome:
-
-     ```
-     "C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk-printing https://<your-site>/billing
-     ```
-
-     or Edge:
-
-     ```
-     "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --kiosk-printing https://<your-site>/billing
-     ```
-
-   - Name it *Billing* and always open the till from this shortcut. Close every
-     other Chrome window first: the option only works when Chrome starts from it.
-   - Bills now print to Windows' **default printer**, so set the thermal
-     printer as default (Settings → Bluetooth & devices → Printers & scanners
-     → *your printer* → **Set as default**).
-2. **Paper settings (once).** Direct printing reuses the last print-dialog
-   settings. Open the billing page once *without* the shortcut, press
-   **Ctrl+P**, choose the thermal printer, open **More settings** and set:
+1. **In the print dialog** (press *Print* on a bill), choose the thermal
+   printer, open **More settings** and set:
    - **Paper size:** the printer's 80 mm receipt / roll size
    - **Margins:** None
    - **Scale:** Default
    - **Headers and footers:** off (unticked)
-3. **If blank paper still comes out after each slip**, open Windows **Settings
+2. **If blank paper still comes out after each slip**, open Windows **Settings
    → Bluetooth & devices → Printers & scanners → *your printer* → Printing
    preferences**, choose the same 80 mm receipt size there, and switch on the
    driver's option that stops at the end of the printed lines (names differ:
    *paper saving*, *reduce blank space*, *feed/cut at end of page*). Set the
    cutter to cut **after each page**, so the bill and the token slip come out
    separately.
+3. Optional, for one-tap printing without the dialog: start Chrome on the
+   counter PC with the `--kiosk-printing` option (add it to the end of the
+   Chrome shortcut's *Target*); it then prints straight to the default printer
+   with those settings.
 
-**Save** records a bill without printing it (printer out of paper, or the
-customer wants no slip).
-
-Without the shortcut the browser shows its print dialog, and pressing
-*Cancel* there still leaves the bill saved: the browser does not tell the page
-that the print was cancelled. An admin can delete such a bill from the bill
-register in Analytics.
+The print preview always shows the whole paper; whether the blank part is fed
+depends on step 2.
 
 ## Your data: bills and reports
 
