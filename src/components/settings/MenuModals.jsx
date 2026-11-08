@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createMenuItem, deleteMenuItem, updateMenuItem } from '../../api';
-import { assetUrl, errorMessage } from '../../api/client';
+import { errorMessage } from '../../api/client';
 import { rupees } from '../../utils/format';
 import { orderedSizes } from '../../utils/sizes';
 import useNumberGuard from '../../hooks/useNumberGuard';
 import Select from '../ui/Select';
+import { cardImageProps } from '../menu/cardImage';
 import MenuItemFields from './MenuItemFields';
 import ModalShell from './ModalShell';
 import { useNotify } from '../notifications/notification-context';
@@ -122,7 +123,6 @@ export function AddMenuItemModal({ onClose, categories = [], onRefresh }) {
   const [sizes, setSizes] = useState([{ ...EMPTY_SIZE }]);
   const [busy, setBusy] = useState(false);
   const notify = useNotify();
-  const guardNumber = useNumberGuard();
 
   // Default to the first category once they have loaded.
   useEffect(() => {
@@ -200,83 +200,15 @@ export function AddMenuItemModal({ onClose, categories = [], onRefresh }) {
           </button>
         </div>
 
-        <div className="add-menu-split">
-          <div className="add-menu-left">
-            <div className="form-group">
-              <label htmlFor="menu-item-name">Item name *</label>
-              <input
-                id="menu-item-name"
-                type="text"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="e.g. Chicken 65 Mandi"
-                disabled={busy}
-              />
-            </div>
-
-            {!isGroup && (
-              <div className="form-group">
-                <label htmlFor="menu-item-price">Price (₹) *</label>
-                <input
-                  id="menu-item-price"
-                  type="number"
-                  min="1"
-                  step="0.01"
-                  value={form.price}
-                  onChange={(e) => {
-                    if (guardNumber(e.target.value, { min: 1, message: 'Enter a price above zero.' })) {
-                      setForm({ ...form, price: e.target.value });
-                    }
-                  }}
-                  placeholder="e.g. 150"
-                  disabled={busy}
-                />
-              </div>
-            )}
-
-            {isGroup && <GroupSizesField sizes={sizes} onChange={setSizes} disabled={busy} />}
-
-            <div className="form-group">
-              <label htmlFor="menu-item-category">Category *</label>
-              <Select
-                id="menu-item-category"
-                value={form.category}
-                onChange={(next) => setForm({ ...form, category: next })}
-                options={categories}
-                placeholder="Choose a category"
-                disabled={busy}
-              />
-            </div>
-          </div>
-
-          <div className="add-menu-right">
-            <div className="form-group">
-              <label htmlFor="menu-item-image">Image URL (optional)</label>
-              <input
-                id="menu-item-image"
-                type="url"
-                value={form.imageUrl}
-                onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                placeholder="https://example.com/dish.jpg"
-                disabled={busy}
-              />
-              <div className="field-note">Paste a full image URL</div>
-            </div>
-
-            <label className="preview-label">Live preview</label>
-            <div
-              className="menu-item menu-item-preview"
-              style={assetUrl(form.imageUrl) ? { backgroundImage: `url('${assetUrl(form.imageUrl)}')` } : undefined}
-            >
-              <div className="menu-item-info">
-                <div className="item-name">{form.name || 'Item name'}</div>
-                <div className="item-price">
-                  {isGroup ? 'Group' : rupees(Number(form.price) > 0 ? Number(form.price) : 0)}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <MenuItemFields
+          value={form}
+          onChange={setForm}
+          categories={categories}
+          disabled={busy}
+          priceField={!isGroup}
+          sizesSlot={<GroupSizesField sizes={sizes} onChange={setSizes} disabled={busy} />}
+          previewPriceLabel={isGroup ? 'Group' : undefined}
+        />
 
         <div className="modal-actions">
           <button type="button" className="btn-cancel" onClick={onClose} disabled={busy}>Close</button>
@@ -423,6 +355,7 @@ export function EditMenuModal({ onClose, categories = [], items = [], onRefresh 
                   label: item.isGroup ? `${item.name} (group)` : item.name,
                 }))}
                 placeholder="Select an item"
+                keepCase
                 disabled={busy}
               />
             </div>
@@ -553,7 +486,7 @@ export function DeleteMenuModal({ onClose, categories: allCategories = [], items
                   key={item.id}
                   type="button"
                   className={`menu-item delete-card-item ${selected.has(item.name) ? 'selected' : ''}`}
-                  style={assetUrl(item.imageUrl) ? { backgroundImage: `url('${assetUrl(item.imageUrl)}')` } : undefined}
+                  {...cardImageProps(item.imageUrl)}
                   onClick={() => toggle(item.name)}
                   disabled={busy}
                 >

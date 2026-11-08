@@ -368,6 +368,7 @@
   padding: 10px;
 }
 .edit-menu-sidebar-btn {
+  text-transform: capitalize;
   background: transparent;
   border: 1px solid transparent;
   color: var(--modal-ink);
@@ -427,6 +428,9 @@
   overflow-y: auto;
   max-height: 50vh;
   padding-right: 8px;
+}
+.delete-category-list .item-name {
+  text-transform: capitalize;
 }
 .delete-category-list .delete-card-item {
   min-height: 72px;

@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { assetUrl } from '../../api/client';
 import { useNotify } from '../notifications/notification-context';
 import { rupees } from '../../utils/format';
+import { cardImageProps } from './cardImage';
 
 /**
  * Category tabs plus the menu grid for the billing portal.
@@ -56,13 +56,11 @@ function useTabColumns(count) {
 }
 
 function MenuCard({ item, onSelect }) {
-  const image = assetUrl(item.imageUrl);
   return (
     <button
       type="button"
       className="menu-item"
-      data-has-image={image ? '' : undefined}
-      style={image ? { backgroundImage: `url('${image}')` } : undefined}
+      {...cardImageProps(item.imageUrl)}
       onClick={() => onSelect(item)}
     >
       <div className="menu-item-info">

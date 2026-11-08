@@ -1,4 +1,4 @@
-import { assetUrl } from '../../api/client';
+import { cardImageProps } from '../menu/cardImage';
 import useNumberGuard from '../../hooks/useNumberGuard';
 import Select from '../ui/Select';
 import { rupees } from '../../utils/format';
@@ -31,7 +31,6 @@ export default function MenuItemFields({
     }
   };
   const previewPrice = Number(value.price) > 0 ? Number(value.price) : 0;
-  const preview = assetUrl(value.imageUrl);
 
   return (
     <div className="add-menu-split">
@@ -98,7 +97,7 @@ export default function MenuItemFields({
         <label className="preview-label">Live preview</label>
         <div
           className="menu-item menu-item-preview"
-          style={preview ? { backgroundImage: `url('${preview}')` } : undefined}
+          {...cardImageProps(value.imageUrl)}
         >
           <div className="menu-item-info">
             <div className="item-name">{value.name || 'Item name'}</div>

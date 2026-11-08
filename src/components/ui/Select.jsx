@@ -24,6 +24,9 @@ export default function Select({
   id,
   className = '',
   ariaLabel,
+  // Category names are stored in lower case and shown capitalised; names
+  // such as menu items keep their own spelling.
+  keepCase = false,
 }) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState(null);
@@ -133,7 +136,7 @@ export default function Select({
         type="button"
         id={id}
         ref={triggerRef}
-        className={`ui-select ${open ? 'is-open' : ''} ${className}`}
+        className={`ui-select ${open ? 'is-open' : ''} ${keepCase ? 'keep-case' : ''} ${className}`}
         onClick={() => !disabled && setOpen((current) => !current)}
         onKeyDown={onKeyDown}
         disabled={disabled}
@@ -155,7 +158,7 @@ export default function Select({
           ref={listRef}
           id={listId}
           role="listbox"
-          className="ui-select-list"
+          className={`ui-select-list ${keepCase ? 'keep-case' : ''}`}
           style={{
             left: position.left,
             width: position.width,

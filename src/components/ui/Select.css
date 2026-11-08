@@ -86,6 +86,11 @@
   user-select: none;
 }
 
+.ui-select.keep-case .ui-select-value,
+.ui-select-list.keep-case .ui-select-option {
+  text-transform: none;
+}
+
 .ui-select-option.is-active {
   background: var(--accent-soft);
 }
