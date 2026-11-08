@@ -13,6 +13,21 @@ function endOfDay(value) {
   return date;
 }
 
+/**
+ * The category of a sold item: what the bill recorded (bills from now on),
+ * else the menu item with the same name today (older bills), also trying the
+ * name without a size suffix such as "Idli (solo)". Unmatched items count as
+ * "other".
+ */
+function categoryResolver(menuItems) {
+  const byName = new Map(menuItems.map((item) => [item.name.trim().toLowerCase(), item.category]));
+  return (item) => {
+    if (item.category) return item.category;
+    const name = String(item.name || '').trim().toLowerCase();
+    return byName.get(name) || byName.get(name.replace(/\s*\([^)]*\)$/, '')) || 'other';
+  };
+}
+
 function inRange(bill, from, to) {
   const time = new Date(bill.createdAt).getTime();
   return time >= from.getTime() && time <= to.getTime();
@@ -24,7 +39,7 @@ function inRange(bill, from, to) {
  * Kept apart from the component so the arithmetic is readable on its own and
  * runs once per input change instead of on every render.
  */
-export default function useSalesStats(bills, { mode, customDate, rangeFrom, rangeTo }) {
+export default function useSalesStats(bills, { mode, customDate, rangeFrom, rangeTo }, menuItems = []) {
   return useMemo(() => {
     const active = bills.filter((bill) => !bill.deleted);
 
@@ -57,6 +72,8 @@ export default function useSalesStats(bills, { mode, customDate, rangeFrom, rang
     const peakHour = busiest ? `${String(busiest[0]).padStart(2, '0')}:00` : 'N/A';
 
     const itemTotals = new Map();
+    const categoryTotals = new Map();
+    const categoryOf = categoryResolver(menuItems);
     const paymentTotals = new Map();
     const orderTypeTotals = new Map();
 
@@ -70,15 +87,42 @@ export default function useSalesStats(bills, { mode, customDate, rangeFrom, rang
       typeEntry.total += bill.total || 0;
       orderTypeTotals.set(orderType, typeEntry);
 
-      (bill.items || []).forEach((item) => {
+      // A bill's discount is shared across its items in proportion to their
+      // value, so the category earnings add up to the bill totals (revenue).
+      const lines = bill.items || [];
+      const gross = lines.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 1), 0);
+      const keep = gross > 0 ? (bill.total || 0) / gross : 0;
+
+      lines.forEach((item) => {
+        const qty = item.qty || 1;
+        const value = (item.price || 0) * qty;
+
         const entry = itemTotals.get(item.name) || { qty: 0, total: 0 };
-        entry.qty += item.qty || 1;
-        entry.total += (item.price || 0) * (item.qty || 1);
+        entry.qty += qty;
+        entry.total += value;
         itemTotals.set(item.name, entry);
+
+        const category = categoryOf(item);
+        const cat = categoryTotals.get(category) || { qty: 0, total: 0, bills: new Set() };
+        cat.qty += qty;
+        cat.total += value * keep;
+        cat.bills.add(bill.id || bill.billNumber);
+        categoryTotals.set(category, cat);
       });
     });
 
     const itemRows = [...itemTotals.entries()].map(([name, d]) => ({ name, qty: d.qty, total: d.total }));
+
+    const categoryEarned = [...categoryTotals.values()].reduce((sum, d) => sum + d.total, 0);
+    const categoryRows = [...categoryTotals.entries()]
+      .map(([category, d]) => ({
+        category,
+        qty: d.qty,
+        bills: d.bills.size,
+        total: Math.round(d.total),
+        share: categoryEarned > 0 ? (d.total / categoryEarned) * 100 : 0,
+      }))
+      .sort((a, b) => b.total - a.total);
 
     // Seven-day trend always ends today, regardless of the selected filter.
     const trend = [];
@@ -107,9 +151,10 @@ export default function useSalesStats(bills, { mode, customDate, rangeFrom, rang
       monthRevenue: sumOf(monthBills),
       topItems: [...itemRows].sort((a, b) => b.qty - a.qty).slice(0, 10),
       itemRows,
+      categoryRows,
       orderTypeRows: [...orderTypeTotals.entries()].map(([type, d]) => ({ type, ...d })),
       paymentTotals: Object.fromEntries(paymentTotals),
       trend,
     };
-  }, [bills, mode, customDate, rangeFrom, rangeTo]);
+  }, [bills, mode, customDate, rangeFrom, rangeTo, menuItems]);
 }

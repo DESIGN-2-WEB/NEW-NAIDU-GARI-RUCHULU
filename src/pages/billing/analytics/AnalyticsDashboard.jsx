@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import { downloadSalesWorkbook, fetchBills } from '../../../api';
+import { downloadSalesWorkbook, fetchBills, fetchMenuItems } from '../../../api';
 import { errorMessage } from '../../../api/client';
 import CustomDatePicker from '../../../components/ui/CustomDatePicker';
 import { useNotify } from '../../../components/notifications/notification-context';
 import AnalyticsBillRegister from './AnalyticsBillRegister';
+import AnalyticsCategories from './AnalyticsCategories';
 import AnalyticsCharts from './AnalyticsCharts';
 import AnalyticsStats from './AnalyticsStats';
 import AnalyticsTables from './AnalyticsTables';
@@ -65,6 +66,13 @@ export default function AnalyticsDashboard() {
 
   useEffect(() => { load(); }, [load]);
 
+  // Today's menu tells older bills (saved before items carried their
+  // category) which category each item belongs to.
+  const [menuItems, setMenuItems] = useState([]);
+  useEffect(() => {
+    fetchMenuItems().then(setMenuItems).catch(() => setMenuItems([]));
+  }, []);
+
   // A failed load is reported once as a toast; the panel keeps a plain retry
   // row so the page is never just a red line of text.
   useEffect(() => {
@@ -77,7 +85,7 @@ export default function AnalyticsDashboard() {
     return () => window.removeEventListener('analytics:download', open);
   }, []);
 
-  const stats = useSalesStats(bills, { mode, customDate, rangeFrom, rangeTo });
+  const stats = useSalesStats(bills, { mode, customDate, rangeFrom, rangeTo }, menuItems);
 
   const exportReport = async () => {
     if (!downloadFrom || !downloadTo) { notify('Pick both dates.', 'error'); return; }
@@ -161,6 +169,8 @@ export default function AnalyticsDashboard() {
           paymentTotals={stats.paymentTotals}
           trend={stats.trend}
         />
+
+        <AnalyticsCategories rows={stats.categoryRows} />
 
         <AnalyticsTables itemRows={stats.itemRows} orderTypeRows={stats.orderTypeRows} />
 
