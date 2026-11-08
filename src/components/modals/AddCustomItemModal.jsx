@@ -4,6 +4,7 @@ import { errorMessage } from '../../api/client';
 import useNumberGuard from '../../hooks/useNumberGuard';
 import { useNotify } from '../notifications/notification-context';
 import './Modals.css';
+import { CUSTOM_CATEGORY } from '../../config/roles';
 
 /**
  * Quick entry for a one-off item that isn't on the menu, filed under
@@ -29,7 +30,7 @@ export default function AddCustomItemModal({ onClose, onAdded }) {
       const form = new FormData();
       form.append('name', trimmed);
       form.append('price', String(value));
-      form.append('category', 'custom');
+      form.append('category', CUSTOM_CATEGORY);
 
       await createMenuItem(form);
       onAdded(trimmed, value);

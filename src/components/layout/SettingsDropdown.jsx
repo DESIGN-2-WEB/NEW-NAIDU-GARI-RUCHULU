@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MenuPopup, { MenuGroup, MenuItem } from '../ui/MenuPopup';
 import { activeTheme, setTheme } from '../../styles/theme';
 import { GearIcon } from '../ui/icons';
+import { isAdmin } from '../../config/roles';
 
 /** Turn a stored username into something worth showing on screen. */
 function displayName(user) {
@@ -30,7 +32,11 @@ export default function SettingsDropdown({
 }) {
   const [openGroup, setOpenGroup] = useState(null);
   const [theme, setThemeState] = useState(() => activeTheme());
-  const isAdmin = user?.role === 'admin';
+  const admin = isAdmin(user);
+  const navigate = useNavigate();
+  const openManagement = (section) => navigate(`/billing/management?section=${section}`);
+  // The menu dialogs live on the billing page; elsewhere their items are hidden.
+  const canEditMenu = admin && Boolean(onAddCategory);
 
   const toggle = (name) => setOpenGroup((current) => (current === name ? null : name));
 
@@ -48,7 +54,7 @@ export default function SettingsDropdown({
               <span className="menu-user-role">{user?.role || 'staff'}</span>
             </div>
 
-            {isAdmin && (
+            {canEditMenu && (
               <>
                 <MenuGroup
                   label="Categories"
@@ -68,7 +74,28 @@ export default function SettingsDropdown({
                   <MenuItem onClick={run(onEditMenu)}>Edit item</MenuItem>
                   <MenuItem onClick={run(onDeleteMenu)} danger>Delete item</MenuItem>
                 </MenuGroup>
+              </>
+            )}
 
+            {admin && (
+              <>
+                <MenuGroup
+                  label="Management"
+                  open={openGroup === 'management'}
+                  onToggle={() => toggle('management')}
+                >
+                  <MenuItem onClick={run(() => openManagement('restaurant'))}>Restaurant details</MenuItem>
+                  <MenuItem onClick={run(() => openManagement('users'))}>Users</MenuItem>
+                  <MenuItem onClick={run(() => openManagement('account'))}>My account</MenuItem>
+                </MenuGroup>
+
+                <div className="menu-divider" />
+              </>
+            )}
+
+            {!admin && (
+              <>
+                <MenuItem onClick={run(() => openManagement('account'))}>My account</MenuItem>
                 <div className="menu-divider" />
               </>
             )}

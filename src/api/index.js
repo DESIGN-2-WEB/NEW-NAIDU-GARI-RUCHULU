@@ -24,6 +24,27 @@ export const logout = () => client.post('/api/auth/logout').then((r) => r.data);
 export const fetchSettings = () =>
   client.get('/api/settings', { skipAuthRedirect: true }).then((r) => r.data.settings);
 
+// ------------------------------------------------------------ management
+
+/** Management -> Restaurant: save name, tagline, owner, address, phones, GSTIN. */
+export const updateSettings = (fields) =>
+  client.put('/api/settings', fields).then((r) => r.data.settings);
+
+/** Management -> Users (admin). */
+export const fetchUsers = () => client.get('/api/users').then((r) => r.data.users || []);
+
+export const createUser = (user) => client.post('/api/users', user).then((r) => r.data);
+
+export const deleteUser = (id) =>
+  client.delete(`/api/users/${encodeURIComponent(id)}`).then((r) => r.data);
+
+export const resetUserPassword = (id, password) =>
+  client.put(`/api/users/${encodeURIComponent(id)}/password`, { password }).then((r) => r.data);
+
+/** Management -> My account: change the signed-in user's own password. */
+export const changeMyPassword = (currentPassword, newPassword) =>
+  client.post('/api/auth/password', { currentPassword, newPassword }).then((r) => r.data);
+
 // ------------------------------------------------------------------ menu
 
 export const fetchMenuItems = () => client.get('/api/custom-items').then((r) => r.data.items || []);

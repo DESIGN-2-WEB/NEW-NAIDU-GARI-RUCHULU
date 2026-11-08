@@ -91,7 +91,7 @@ export default function SharedHeader({
       {showHeaderInfo && (
         <div className="header-info">
           <div className="location">
-            <strong>Location:&nbsp;</strong>
+            <strong>Address:&nbsp;</strong>
             <span>
               {RESTAURANT.location}
             </span>

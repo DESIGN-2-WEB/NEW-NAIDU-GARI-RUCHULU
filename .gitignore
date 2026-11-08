@@ -38,3 +38,6 @@ pnpm-debug.log*
 
 # Copies of database records removed during cleanups
 backups/
+
+# Browser-test output
+.playwright-mcp/

@@ -10,6 +10,7 @@ from bson.errors import InvalidId
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
 
+from server.roles import ADMIN, ROLES
 from server.timeutil import as_utc, local_day_start, to_iso, utc_now
 from server.validation import validate_bill
 
@@ -73,7 +74,7 @@ def next_bill_number():
 
 
 @bp.post("/bill")
-@roles_required("admin", "cashier")
+@roles_required(*ROLES)
 @handle_errors
 def save_bill(user):
     """Record a finalised bill."""
@@ -107,7 +108,7 @@ def save_bill(user):
 
 
 @bp.get("/bills")
-@roles_required("admin", "cashier")
+@roles_required(*ROLES)
 @handle_errors
 def list_bills(user):
     """The bill register, newest first."""
@@ -127,7 +128,7 @@ def list_bills(user):
 
 
 @bp.get("/bill/<bill_id>")
-@roles_required("admin", "cashier")
+@roles_required(*ROLES)
 @handle_errors
 def get_bill(user, bill_id):
     bill = _find(bill_id)
@@ -152,7 +153,7 @@ def _find(bill_id: str):
 
 
 @bp.delete("/bill/<bill_id>/permanent-delete")
-@roles_required("admin")
+@roles_required(ADMIN)
 @handle_errors
 def destroy_bill(user, bill_id):
     bill = _find(bill_id)

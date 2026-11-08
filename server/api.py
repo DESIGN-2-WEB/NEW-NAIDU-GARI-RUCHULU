@@ -54,6 +54,12 @@ def current_user() -> dict | None:
     return user
 
 
+def forget_user(identity: str) -> None:
+    """Drop a user from the cache, so a deleted account or a new password
+    takes effect on its next request instead of up to a minute later."""
+    _user_cache.pop(str(identity), None)
+
+
 def public_user(user: dict) -> dict:
     return {
         "id": str(user["_id"]),

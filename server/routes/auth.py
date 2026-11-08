@@ -1,4 +1,4 @@
-"""Login, token verification and logout."""
+"""Login, token verification, logout and changing your own password."""
 
 import logging
 
@@ -6,7 +6,9 @@ from flask import Blueprint, request
 
 from server import db
 from server.api import fail, handle_errors, ok, public_user, roles_required
-from server.security import verify_password
+from server.security import hash_password, password_problem, verify_password
+from server.roles import ROLES
+from server.timeutil import utc_now
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,7 @@ bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 def accounts():
     users = db.users.find(
         {
-            "role": {"$in": ("admin", "cashier")},
+            "role": {"$in": ROLES},
             "password": {"$type": "string"},
         },
         {"_id": 0, "email": 1, "username": 1, "role": 1},
@@ -85,3 +87,28 @@ def logout(user):
     """
     logger.info("Logout: %s", user.get("username"))
     return ok({"message": "Logged out"})
+
+
+@bp.post("/password")
+@roles_required()
+@handle_errors
+def change_password(user):
+    """Management -> My account: change your own password (the current one
+    is asked for, so an unattended signed-in screen cannot be used to)."""
+    data = request.get_json(silent=True) or {}
+    stored = db.users.find_one({"_id": user["_id"]}, {"password": 1})
+    if not stored or not verify_password(data.get("currentPassword", ""), stored.get("password")):
+        return fail("Your current password is not correct", 400)
+    new_password = data.get("newPassword", "")
+    problem = password_problem(new_password)
+    if problem:
+        return fail(problem, 400)
+    if verify_password(new_password, stored.get("password")):
+        return fail("The new password must be different from the current one", 400)
+
+    db.users.update_one(
+        {"_id": user["_id"]},
+        {"$set": {"password": hash_password(new_password), "passwordChangedAt": utc_now()}},
+    )
+    logger.info("Password changed: %s", user.get("username"))
+    return ok({"message": "Password changed"})

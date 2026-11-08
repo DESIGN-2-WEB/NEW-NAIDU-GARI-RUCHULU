@@ -2,7 +2,7 @@
 
 from flask import Flask
 
-from server.routes import auth, bills, menu, reports, system
+from server.routes import auth, bills, menu, reports, system, users
 
 BLUEPRINTS = (
     auth.bp,
@@ -10,6 +10,7 @@ BLUEPRINTS = (
     menu.bp,
     reports.bp,
     system.bp,
+    users.bp,
 )
 
 

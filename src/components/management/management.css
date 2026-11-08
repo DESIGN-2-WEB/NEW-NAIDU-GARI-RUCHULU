@@ -1,0 +1,498 @@
+/* Management page (/billing/management): restaurant details, users and
+   My account. Self-contained: it does not use the dialog styles, and every
+   colour is a theme variable, so it follows the light and dark theme. */
+
+.mgmt-page {
+  --mgmt-radius: 14px;
+  --mgmt-field-h: 46px;
+  font-family: var(--font-ui);
+  color: var(--text);
+}
+.mgmt-page button,
+.mgmt-page input {
+  font-family: inherit;
+}
+
+/* ---- layout: side menu + panel; on phones the menu becomes tabs ---- */
+.mgmt-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 24px 40px;
+  box-sizing: border-box;
+}
+.mgmt-layout:not(:has(.mgmt-nav)) {
+  grid-template-columns: minmax(0, 640px);
+  justify-content: center;
+}
+
+.mgmt-nav {
+  position: sticky;
+  top: 16px;
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border-radius: var(--mgmt-radius);
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.mgmt-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.mgmt-nav-item svg {
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+.mgmt-nav-item:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--text-strong);
+}
+.mgmt-nav-item.active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+.mgmt-nav-item.active svg {
+  color: inherit;
+}
+.mgmt-nav-item:disabled {
+  cursor: progress;
+}
+
+.mgmt-panel {
+  min-width: 0;
+  padding: 24px 28px 28px;
+  border-radius: var(--mgmt-radius);
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.mgmt-panel-head {
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.mgmt-panel-head h2 {
+  margin: 0 0 6px;
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--text-heading);
+  letter-spacing: -0.01em;
+}
+.mgmt-panel-head p {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--muted);
+  max-width: 62ch;
+}
+
+/* ---- fields ---- */
+.mgmt-form {
+  display: block;
+}
+.mgmt-narrow {
+  max-width: 440px;
+}
+.mgmt-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+}
+.mgmt-field {
+  margin-bottom: 16px;
+}
+.mgmt-field > label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+.mgmt-optional {
+  font-weight: 400;
+  color: var(--muted);
+}
+.mgmt-page .mgmt-field input,
+.mgmt-page .mgmt-inline input {
+  width: 100%;
+  min-height: var(--mgmt-field-h);
+  padding: 0 14px;
+  box-sizing: border-box;
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text-strong);
+  font-size: var(--fs-md);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.mgmt-page .mgmt-field input::placeholder,
+.mgmt-page .mgmt-inline input::placeholder {
+  color: var(--muted);
+  opacity: 0.8;
+}
+.mgmt-page .mgmt-field input:focus,
+.mgmt-page .mgmt-inline input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+.mgmt-page .mgmt-field input:disabled {
+  opacity: 0.7;
+}
+/* The shared dropdown, sized and bordered like the text fields. */
+.mgmt-page .mgmt-field .ui-select {
+  min-height: var(--mgmt-field-h);
+  padding: 0 14px;
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text-strong);
+  font-size: var(--fs-md);
+}
+.mgmt-page .mgmt-field .ui-select:hover:not(:disabled),
+.mgmt-page .mgmt-field .ui-select.is-open {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+.mgmt-field-note {
+  display: block;
+  margin-top: 6px;
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+.mgmt-hint {
+  margin: 0 0 14px;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+.mgmt-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+/* Phone numbers and password boxes */
+.mgmt-phones {
+  display: grid;
+  gap: 8px;
+}
+.mgmt-phone-row,
+.mgmt-password {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mgmt-phone-row input,
+.mgmt-password input {
+  flex: 1;
+  min-width: 0;
+}
+.mgmt-password .mgmt-icon-btn {
+  position: absolute;
+  right: 6px;
+}
+.mgmt-page .mgmt-password input {
+  padding-right: 46px;
+}
+.mgmt-password input::-ms-reveal,
+.mgmt-password input::-ms-clear {
+  display: none;
+}
+
+/* ---- buttons ---- */
+.mgmt-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.mgmt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-strong);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+}
+.mgmt-btn:hover:not(:disabled) {
+  background: var(--hover);
+}
+.mgmt-btn-primary {
+  min-width: 160px;
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  box-shadow: 0 4px 12px var(--shadow);
+}
+.mgmt-btn-primary:hover:not(:disabled) {
+  background: var(--primary);
+  transform: translateY(-1px);
+}
+.mgmt-btn-danger {
+  border-color: transparent;
+  background: var(--danger);
+  color: var(--danger-contrast);
+}
+.mgmt-btn-danger:hover:not(:disabled) {
+  background: var(--danger-strong);
+}
+.mgmt-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.mgmt-icon-btn {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.mgmt-icon-btn:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--text-strong);
+}
+.mgmt-icon-btn.danger:hover:not(:disabled) {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.mgmt-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.mgmt-link-btn {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 2px;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.mgmt-link-btn:disabled {
+  opacity: 0.5;
+}
+
+/* ---- people ---- */
+.mgmt-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(150deg, var(--header-grad-b), var(--header-grad-a));
+  color: var(--gold);
+  font-weight: 800;
+}
+.mgmt-me {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 440px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+}
+.mgmt-me-name,
+.mgmt-user-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+.mgmt-me-meta,
+.mgmt-user-email {
+  display: block;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.mgmt-users > section + section {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.mgmt-user-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.mgmt-user {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel-6);
+}
+.mgmt-user-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.mgmt-user-text {
+  flex: 1;
+  min-width: 0;
+}
+.mgmt-user-actions {
+  display: flex;
+  gap: 2px;
+}
+.mgmt-badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--hover);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.mgmt-role-admin {
+  background: var(--accent-soft);
+  color: var(--accent-soft-text);
+}
+.mgmt-badge-you {
+  background: var(--info-soft);
+  color: var(--info-soft-text);
+}
+
+.mgmt-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+.mgmt-inline > .mgmt-password {
+  flex: 1 1 240px;
+}
+.mgmt-inline-danger {
+  color: var(--danger);
+  font-size: var(--fs-sm);
+}
+.mgmt-inline-danger > span:first-child {
+  flex: 1 1 240px;
+  line-height: 1.5;
+}
+.mgmt-inline-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* ---- tablets ---- */
+@media (max-width: 860px) {
+  .mgmt-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 18px 16px 32px;
+  }
+  .mgmt-nav {
+    position: static;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    padding: 6px;
+    overflow-x: auto;
+  }
+  .mgmt-nav-item {
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: var(--fs-sm);
+    white-space: nowrap;
+  }
+  .mgmt-panel {
+    padding: 20px 18px 22px;
+  }
+}
+
+/* ---- phones ---- */
+@media (max-width: 560px) {
+  .mgmt-nav-item svg {
+    display: none;
+  }
+  .mgmt-grid {
+    grid-template-columns: 1fr;
+  }
+  .mgmt-panel {
+    padding: 18px 14px 20px;
+  }
+  .mgmt-actions {
+    justify-content: stretch;
+  }
+  .mgmt-actions .mgmt-btn {
+    flex: 1;
+  }
+  .mgmt-user-main {
+    flex-wrap: wrap;
+  }
+  .mgmt-user-text {
+    flex-basis: calc(100% - 50px);
+  }
+  .mgmt-user-main .mgmt-badge {
+    margin-left: 50px;
+  }
+  .mgmt-user-actions {
+    margin-left: auto;
+  }
+  .mgmt-inline-actions {
+    width: 100%;
+  }
+  .mgmt-inline-actions .mgmt-btn {
+    flex: 1;
+  }
+}

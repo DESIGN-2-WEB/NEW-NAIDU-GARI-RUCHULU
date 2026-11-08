@@ -1,9 +1,14 @@
 """Health check, the restaurant settings and the install-app manifest."""
 
-from flask import Blueprint, jsonify
+import logging
+
+from flask import Blueprint, jsonify, request
 
 from server import db, settings
-from server.api import handle_errors, ok
+from server.roles import ADMIN
+from server.api import fail, handle_errors, ok, roles_required
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint("system", __name__)
 
@@ -33,6 +38,20 @@ def restaurant_settings():
     """Everything the screens show about the restaurant (no secrets: the same
     details are printed on every bill). Read before sign-in by the login page."""
     return ok({"settings": settings.get()})
+
+
+@bp.put("/api/settings")
+@roles_required(ADMIN)
+@handle_errors
+def update_restaurant_settings(user):
+    """Management -> Restaurant: name, tagline, owner, address, phones, GSTIN."""
+    data = request.get_json(silent=True) or {}
+    fields, error = settings.clean_editable({k: data[k] for k in settings.EDITABLE if k in data})
+    if fields is None:
+        return fail(error, 400)
+    current = settings.update(fields)
+    logger.info("Restaurant details changed by %s: %s", user.get("username"), ", ".join(sorted(fields)))
+    return ok({"message": "Restaurant details saved", "settings": current})
 
 
 @bp.get("/api/manifest.webmanifest")

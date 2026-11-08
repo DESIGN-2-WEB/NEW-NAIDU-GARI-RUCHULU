@@ -8,6 +8,7 @@ from flask import Blueprint, Response, request
 import re
 
 from server import db, settings
+from server.roles import ADMIN
 from server.api import fail, handle_errors, roles_required
 from server.reports import build_sales_workbook
 from server.timeutil import LOCAL_TZ
@@ -33,7 +34,7 @@ def _parse_day(value: str | None, name: str) -> date:
 
 
 @bp.get("/sales.xlsx")
-@roles_required("admin")
+@roles_required(ADMIN)
 @handle_errors
 def sales_workbook(user):
     """Sales for a date range as an Excel workbook.

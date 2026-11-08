@@ -8,13 +8,15 @@ from flask import Blueprint, request
 
 from server import db
 from server.api import fail, handle_errors, ok, roles_required
+from server.roles import ADMIN, ROLES
 from server.timeutil import utc_now
 
 logger = logging.getLogger(__name__)
 
 bp = Blueprint("menu", __name__, url_prefix="/api")
 
-ALL_STAFF = ("admin", "cashier")
+# The category one-off items from the + button are filed under.
+CUSTOM_CATEGORY = "custom"
 
 
 def _exact_ci(value: str) -> dict:
@@ -104,7 +106,7 @@ def _parse_group_prices(data) -> dict | None:
 
 
 @bp.get("/custom-items")
-@roles_required(*ALL_STAFF)
+@roles_required(*ROLES)
 @handle_errors
 def list_items(user):
     items = db.custom_items.find({}).sort("name", 1)
@@ -112,7 +114,7 @@ def list_items(user):
 
 
 @bp.post("/custom-items")
-@roles_required("admin", "cashier")
+@roles_required(*ROLES)
 @handle_errors
 def create_item(user):
     """Add a menu item (form data; the picture, if any, is a link in image_url)."""
@@ -124,7 +126,7 @@ def create_item(user):
     if db.custom_items.find_one({"name": _exact_ci(name)}):
         return fail("An item with this name already exists", 400)
 
-    category = (form.get("category") or "custom").strip().lower()
+    category = (form.get("category") or CUSTOM_CATEGORY).strip().lower()
     item = {
         "name": name,
         "category": category,
@@ -154,7 +156,7 @@ def create_item(user):
 
 
 @bp.put("/custom-items/<path:name>")
-@roles_required("admin")
+@roles_required(ADMIN)
 @handle_errors
 def update_item(user, name):
     """Rename, reprice, recategorise or re-image an existing menu item.
@@ -217,7 +219,7 @@ def update_item(user, name):
 
 
 @bp.delete("/custom-items/<path:name>")
-@roles_required("admin")
+@roles_required(ADMIN)
 @handle_errors
 def delete_item(user, name):
     if db.custom_items.delete_one({"name": _exact_ci(name)}).deleted_count == 0:
@@ -230,7 +232,7 @@ def delete_item(user, name):
 
 
 @bp.get("/categories")
-@roles_required(*ALL_STAFF)
+@roles_required(*ROLES)
 @handle_errors
 def list_categories(user):
     """Categories in menu order: by their saved position, then by name (a
@@ -246,7 +248,7 @@ def _next_position() -> int:
 
 
 @bp.post("/categories")
-@roles_required("admin")
+@roles_required(ADMIN)
 @handle_errors
 def create_category(user):
     name = str((request.get_json(silent=True) or {}).get("name", "")).strip().lower()
@@ -266,7 +268,7 @@ def create_category(user):
 
 
 @bp.delete("/categories/<path:name>")
-@roles_required("admin")
+@roles_required(ADMIN)
 @handle_errors
 def delete_category(user, name):
     """Delete a category along with every menu item filed under it.

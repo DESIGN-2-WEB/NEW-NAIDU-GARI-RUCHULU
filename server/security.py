@@ -10,6 +10,16 @@ logger = logging.getLogger(__name__)
 # bcrypt truncates at 72 bytes; reject longer input rather than silently
 # accepting a password whose tail is ignored.
 MAX_PASSWORD_BYTES = 72
+MIN_PASSWORD_LENGTH = 6
+
+
+def password_problem(password) -> str | None:
+    """Why ``password`` cannot be used as a new password, or None if it can."""
+    if not isinstance(password, str) or len(password) < MIN_PASSWORD_LENGTH:
+        return f"Password must be at least {MIN_PASSWORD_LENGTH} characters"
+    if len(password.encode("utf-8")) > MAX_PASSWORD_BYTES:
+        return f"Password must be at most {MAX_PASSWORD_BYTES} bytes"
+    return None
 
 
 def hash_password(password: str) -> str:

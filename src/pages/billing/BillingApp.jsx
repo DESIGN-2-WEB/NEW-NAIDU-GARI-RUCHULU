@@ -9,6 +9,7 @@ import RequireAuth from '../../components/auth/RequireAuth';
 import SharedHeader from '../../components/layout/SharedHeader';
 import SharedLogin from '../../components/auth/SharedLogin';
 import { PORTALS } from '../../config/portals';
+import { ADMIN, ROLES, isAdmin } from '../../config/roles';
 import {
   AddCategoryModal,
   AddMenuItemModal,
@@ -17,13 +18,13 @@ import {
   EditMenuModal,
 } from '../../components/settings';
 import { orderCategories } from '../../hooks/useMenu';
+import ManagementPage from './ManagementPage';
 import BillingDashboard from './BillingDashboard';
 
 // Analytics pulls in Chart.js, which the till itself never needs. Loading it
 // on demand keeps the billing screen's bundle small on the counter terminal.
 const AnalyticsDashboard = lazy(() => import('./analytics/AnalyticsDashboard'));
 
-const ROLES = ['admin', 'cashier'];
 const LOGIN_PATH = `${PORTALS.billing.path}/login`;
 
 const NO_MODAL = null;
@@ -52,7 +53,7 @@ function AnalyticsPortal() {
 
 function BillingPortal() {
   const user = useMemo(() => getUser() || {}, []);
-  const isAdmin = user.role === 'admin';
+  const admin = isAdmin(user);
   const notify = useNotify();
 
   const [openModal, setOpenModal] = useState(NO_MODAL);
@@ -63,7 +64,7 @@ function BillingPortal() {
   // The menu-management dialogs need the full catalogue to populate their
   // pickers; only an admin can open them, so only an admin pays for the fetch.
   const loadCatalogue = useCallback(async () => {
-    if (!isAdmin) return;
+    if (!admin) return;
     try {
       const [cats, menuItems] = await Promise.all([fetchCategories(), fetchMenuItems()]);
       setCategories(orderCategories(cats, menuItems));
@@ -74,7 +75,7 @@ function BillingPortal() {
       // empty lists with no idea why.
       notify(errorMessage(err, 'Could not load the menu for the settings dialogs'), 'error');
     }
-  }, [isAdmin, notify]);
+  }, [admin, notify]);
 
   useEffect(() => { loadCatalogue(); }, [loadCatalogue]);
 
@@ -93,7 +94,7 @@ function BillingPortal() {
     <div className="page-shell">
       <SharedHeader
         titleText={PORTALS.billing.name}
-        showAnalyticsBtn={isAdmin}
+        showAnalyticsBtn={admin}
         loginPath={LOGIN_PATH}
         onAddCategory={() => setOpenModal('addCategory')}
         onDeleteCategory={() => setOpenModal('deleteCategory')}
@@ -131,8 +132,16 @@ export default function BillingApp() {
       <Route
         path="/analytics"
         element={
-          <RequireAuth roles={['admin']} loginPath={LOGIN_PATH}>
+          <RequireAuth roles={[ADMIN]} loginPath={LOGIN_PATH}>
             <AnalyticsPortal />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/management"
+        element={
+          <RequireAuth roles={ROLES} loginPath={LOGIN_PATH}>
+            <ManagementPage loginPath={LOGIN_PATH} />
           </RequireAuth>
         }
       />

@@ -11,7 +11,7 @@
  */
 import { fetchSettings } from '../api';
 
-/** name, title, shortName, tagline, location, owner, phones, credit */
+/** name, title, shortName, tagline, location (the address), owner, phones, gstNumber, credit, … */
 export const RESTAURANT = { phones: [] };
 
 /** Payment choices on a bill; the first is preselected. */
@@ -36,16 +36,30 @@ function apply(settings) {
   tableCount = Number(tables) || 0;
 }
 
+function remember(settings) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(settings));
+  } catch {
+    /* storage full or blocked: the next start just fetches again */
+  }
+}
+
+/**
+ * Use the settings the API just returned after the admin saved them in
+ * Management, and tell open screens to redraw (`settings:changed`).
+ */
+export function replaceSettings(settings) {
+  apply(settings);
+  remember(settings);
+  window.dispatchEvent(new Event('settings:changed'));
+}
+
 /** Fetch the settings (falling back to this device's last copy). */
 export async function loadSettings() {
   try {
     const settings = await fetchSettings();
     apply(settings);
-    try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify(settings));
-    } catch {
-      /* storage full or blocked: the next start just fetches again */
-    }
+    remember(settings);
   } catch (err) {
     let cached = null;
     try {

@@ -10,6 +10,7 @@ import MenuBrowser from '../../components/menu/MenuBrowser';
 import AddCustomItemModal from '../../components/modals/AddCustomItemModal';
 import SizeSelectionModal from '../../components/modals/SizeSelectionModal';
 import ReceiptFooter from '../../components/receipt/ReceiptFooter';
+import { CUSTOM_CATEGORY } from '../../config/roles';
 import useCart from '../../hooks/useCart';
 import useMenu from '../../hooks/useMenu';
 import useNumberGuard from '../../hooks/useNumberGuard';
@@ -137,6 +138,7 @@ export default function BillingDashboard() {
           <b>{RESTAURANT.name}</b><br />
           <span className="bill-subtitle">{RESTAURANT.tagline}</span><br />
           <span className="bill-fineprint">Contact No: {RESTAURANT.phones.join(', ')}</span><br />
+          {RESTAURANT.gstNumber && <><span className="bill-fineprint">GSTIN: {RESTAURANT.gstNumber}</span><br /></>}
           <div className="datetime">
             <span>Date: {stamp.toLocaleDateString('en-IN')}</span>
             <span>Time: {stamp.toLocaleTimeString('en-IN')}</span>
@@ -291,7 +293,7 @@ export default function BillingDashboard() {
         <AddCustomItemModal
           onClose={() => setShowCustomItem(false)}
           onAdded={(name, price) => {
-            cart.addItem(name, price, 'custom');
+            cart.addItem(name, price, CUSTOM_CATEGORY);
             menu.reload();
           }}
         />

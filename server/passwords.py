@@ -17,11 +17,10 @@ import getpass
 import sys
 
 from server import db
-from server.security import hash_password
+from server.roles import ROLES
+from server.security import hash_password, password_problem
 from server.timeutil import utc_now
 
-ROLES = ("admin", "cashier")
-MIN_LENGTH = 6
 
 
 def set_password(email: str, password: str, *, role: str | None = None, username: str | None = None) -> str:
@@ -58,8 +57,9 @@ def _read_password(from_stdin: bool) -> str:
         password = getpass.getpass("New password: ")
         if getpass.getpass("Repeat it: ") != password:
             raise SystemExit("Passwords do not match.")
-    if len(password) < MIN_LENGTH:
-        raise SystemExit(f"Password must be at least {MIN_LENGTH} characters.")
+    problem = password_problem(password)
+    if problem:
+        raise SystemExit(problem + ".")
     return password
 
 

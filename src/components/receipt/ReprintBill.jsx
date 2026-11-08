@@ -49,6 +49,7 @@ export default function ReprintBill({ bill, onDone }) {
           <b>{RESTAURANT.name}</b><br />
           <span className="bill-subtitle">{RESTAURANT.tagline}</span><br />
           <span className="bill-fineprint">Contact No: {RESTAURANT.phones.join(', ')}</span><br />
+          {RESTAURANT.gstNumber && <><span className="bill-fineprint">GSTIN: {RESTAURANT.gstNumber}</span><br /></>}
           <div className="datetime">
             <span>Date: {stamp.toLocaleDateString('en-IN')}</span>
             <span>Time: {stamp.toLocaleTimeString('en-IN')}</span>
