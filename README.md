@@ -223,6 +223,9 @@ Excel report show, and the app loads it when it opens:
 | `location`, `owner` | Shown in the billing header |
 | `phones` | Contact numbers printed on bills |
 | `credit` | Footer line |
+| `receiptFooter` | Lines printed at the bottom of every bill (the first one large), e.g. `"Thank you!" "Visit again"` |
+| `loginHeadline` | Login page headline, one value per line; `*stars*` highlight words, e.g. `"Every order," "*perfectly* billed."` |
+| `loginFeatures` | Login page cards as `"icon\|title\|description"`; icons: `receipt`, `chart`, `menu`, `star`, `clock`, `users` |
 | `paymentMethods` | Payment choices on a bill — the first is preselected |
 | `orderTypes` | Order-type choices on a bill — the first is preselected |
 | `tableCount` | Tables in the Table list (1 … `tableCount`) |
@@ -242,7 +245,8 @@ python -m server.settings set phones 9959399849 9490595021
 Text with spaces goes in quotes (`set tagline "Family Restaurant"`); lists take
 several values; `paymentAliases` takes `"old name=new name"` pairs. A change
 shows on every screen the next time it is opened (the API keeps a copy for up
-to a minute). Staff accounts, categories and the menu are in the database too.
+to a minute). Staff accounts, categories (and their order) and the menu, with
+its prices and picture links, are in the database too.
 
 ## Staff accounts and passwords
 

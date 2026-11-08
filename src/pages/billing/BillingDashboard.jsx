@@ -9,6 +9,7 @@ import Select from '../../components/ui/Select';
 import MenuBrowser from '../../components/menu/MenuBrowser';
 import AddCustomItemModal from '../../components/modals/AddCustomItemModal';
 import SizeSelectionModal from '../../components/modals/SizeSelectionModal';
+import ReceiptFooter from '../../components/receipt/ReceiptFooter';
 import useCart from '../../hooks/useCart';
 import useMenu from '../../hooks/useMenu';
 import useNumberGuard from '../../hooks/useNumberGuard';
@@ -245,10 +246,7 @@ export default function BillingDashboard() {
           </button>
         </div>
 
-        <div className="footer">
-          <div className="footer-thanks">Thank you!</div>
-          <div className="footer-visit">🙏 Visit again 🙏</div>
-        </div>
+        <ReceiptFooter />
 
         <div className="cut-line thermal-cut" />
       </div>
@@ -275,10 +273,7 @@ export default function BillingDashboard() {
             <div key={name} className="item">{item.qty} x {name}</div>
           ))}
         </div>
-        <div className="footer">
-          <div className="footer-thanks">Thank you!</div>
-          <div className="footer-visit">🙏 Visit again 🙏</div>
-        </div>
+        <ReceiptFooter />
       </div>
 
       {sizeItem && (

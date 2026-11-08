@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { RESTAURANT } from '../../config/settings';
 import { rupees } from '../../utils/format';
+import ReceiptFooter from './ReceiptFooter';
 
 /**
  * Print a saved bill again, laid out exactly like the slip the Print button
@@ -96,10 +97,7 @@ export default function ReprintBill({ bill, onDone }) {
           <div className="total"><span>Total:</span>{' '}<span>{rupees(bill.total)}</span></div>
         </div>
 
-        <div className="footer">
-          <div className="footer-thanks">Thank you!</div>
-          <div className="footer-visit">🙏 Visit again 🙏</div>
-        </div>
+        <ReceiptFooter />
       </div>
     </main>,
     document.body,

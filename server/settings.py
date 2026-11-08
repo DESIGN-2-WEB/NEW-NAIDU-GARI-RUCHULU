@@ -11,6 +11,9 @@ Change it with:
     python -m server.settings set phones <number> <number>
     python -m server.settings set tableCount 12
     python -m server.settings set paymentAliases "Cash / UPI=Cash"
+    python -m server.settings set receiptFooter "Thank you!" "Visit again"
+    python -m server.settings set loginHeadline "Every order," "*perfectly* billed."
+    python -m server.settings set loginFeatures "receipt|Counter billing|Bills and receipts"
 
 A change reaches every screen the next time it is opened (the API keeps a
 copy for at most CACHE_SECONDS).
@@ -35,6 +38,9 @@ FIELDS = {
     "owner": (str, "owner's name shown in the billing header"),
     "phones": (list, "contact numbers printed on bills"),
     "credit": (str, "footer line"),
+    "receiptFooter": (list, "lines printed at the bottom of every bill, e.g. Thank you!"),
+    "loginHeadline": (list, "login page headline, one value per line; wrap words in *stars* to highlight them"),
+    "loginFeatures": (list, 'login page cards as "icon|title|description"; icons: receipt, chart, menu, star, clock, users'),
     "paymentMethods": (list, "payment choices on a bill; the first is preselected"),
     "orderTypes": (list, "order-type choices on a bill; the first is preselected"),
     "tableCount": (int, "tables in the Table list (1..tableCount)"),

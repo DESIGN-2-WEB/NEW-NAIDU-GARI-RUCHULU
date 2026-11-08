@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowRight, ChartColumn, Check, ChevronDown, Eye, EyeOff,
-  LoaderCircle, Lock, MapPin, Phone, ReceiptText, User, UtensilsCrossed,
+  ArrowRight, ChartColumn, Check, ChevronDown, Clock, Eye, EyeOff, LoaderCircle,
+  Lock, MapPin, Phone, ReceiptText, Star, User, Users, UtensilsCrossed,
 } from 'lucide-react';
 import '@fontsource-variable/playfair-display';
 import '@fontsource-variable/playfair-display/wght-italic.css';
@@ -35,11 +35,30 @@ function rememberAccount(email) {
   }
 }
 
-const FEATURES = [
-  { icon: ReceiptText, title: 'Counter billing', text: 'Bills, thermal receipts and payments' },
-  { icon: ChartColumn, title: 'Sales analytics', text: 'Daily sales, charts and Excel reports' },
-  { icon: UtensilsCrossed, title: 'Menu & categories', text: 'Prices, sizes and custom items' },
-];
+// Icons a login card may name in the `loginFeatures` setting.
+const FEATURE_ICONS = {
+  receipt: ReceiptText,
+  chart: ChartColumn,
+  menu: UtensilsCrossed,
+  star: Star,
+  clock: Clock,
+  users: Users,
+};
+
+/** `loginFeatures` entries ("icon|title|description") as cards. */
+function loginFeatures() {
+  return (RESTAURANT.loginFeatures || [])
+    .map((entry) => String(entry).split('|').map((part) => part.trim()))
+    .filter(([, title]) => title)
+    .map(([icon, title, text = '']) => ({ icon: FEATURE_ICONS[icon.toLowerCase()] || Star, title, text }));
+}
+
+/** One `loginHeadline` line, with *starred* words highlighted. */
+function HeadlineLine({ text }) {
+  return String(text).split(/(\*[^*]+\*)/).map((part, i) => (
+    /^\*[^*]+\*$/.test(part) ? <em key={i}>{part.slice(1, -1)}</em> : part
+  ));
+}
 
 /** Gold line rosette drawn from rotated ellipses, like a spirograph. */
 function Rosette({ className, petals = 36, rx = 150, ry = 62 }) {
@@ -182,6 +201,8 @@ export default function SharedLogin({ portal, targetRole, helperText }) {
   };
 
   const phones = (RESTAURANT.phones || []).filter(Boolean);
+  const headline = (RESTAURANT.loginHeadline || []).filter(Boolean);
+  const features = loginFeatures();
   const listId = 'lg-account-list';
 
   return (
@@ -221,18 +242,24 @@ export default function SharedLogin({ portal, targetRole, helperText }) {
 
           <div className="lg-hero">
             <div className="lg-kicker lg-reveal" style={{ '--d': 2 }}>{portal.name}</div>
-            <h1 className="lg-headline lg-reveal" style={{ '--d': 3 }}>
-              Every order,<br />
-              <em>perfectly</em> billed.
-            </h1>
+            {headline.length > 0 && (
+              <h1 className="lg-headline lg-reveal" style={{ '--d': 3 }}>
+                {headline.map((line, i) => (
+                  <span key={line} className="lg-headline-line">
+                    <HeadlineLine text={line} />
+                    {i < headline.length - 1 && <br />}
+                  </span>
+                ))}
+              </h1>
+            )}
 
             <ul className="lg-features">
-              {FEATURES.map(({ icon: Icon, title, text }, i) => (
+              {features.map(({ icon: Icon, title, text }, i) => (
                 <li key={title} className="lg-feature lg-reveal" style={{ '--d': 5 + i }}>
                   <span className="lg-feature-icon"><Icon size={17} aria-hidden="true" /></span>
                   <span>
                     <span className="lg-feature-title">{title}</span>
-                    <span className="lg-feature-text">{text}</span>
+                    {text && <span className="lg-feature-text">{text}</span>}
                   </span>
                 </li>
               ))}
