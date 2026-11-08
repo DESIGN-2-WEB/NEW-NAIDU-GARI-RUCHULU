@@ -1831,6 +1831,27 @@ box-shadow:0 4px 12px #ffb30066
 transform:translateY(-2px);
 box-shadow:0 6px 16px #ffb30099
 }
+/* Save: record the bill without printing it. */
+.save-bill{
+background:linear-gradient(135deg, #1b6b30 0%, var(--green) 100%);
+color:#fff;
+box-shadow:0 4px 12px #2e8b4566
+}
+.save-bill:hover{
+transform:translateY(-2px);
+box-shadow:0 6px 16px #2e8b4599
+}
+.actions button:disabled{
+opacity:.55;
+cursor:not-allowed;
+transform:none;
+box-shadow:none
+}
+.print-confirm-text{
+margin:0;
+line-height:1.55;
+color:var(--modal-ink, var(--text))
+}
 .clear{
 background:linear-gradient(135deg, #c62828 0%, var(--red) 100%);
 color:var(--danger-contrast);

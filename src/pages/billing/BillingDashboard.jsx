@@ -9,6 +9,7 @@ import Select from '../../components/ui/Select';
 import MenuBrowser from '../../components/menu/MenuBrowser';
 import AddCustomItemModal from '../../components/modals/AddCustomItemModal';
 import SizeSelectionModal from '../../components/modals/SizeSelectionModal';
+import ModalShell from '../../components/settings/ModalShell';
 import useCart from '../../hooks/useCart';
 import useMenu from '../../hooks/useMenu';
 import useNumberGuard from '../../hooks/useNumberGuard';
@@ -36,6 +37,7 @@ export default function BillingDashboard() {
   const [sizeItem, setSizeItem] = useState(null);
   const [showCustomItem, setShowCustomItem] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [confirmPrint, setConfirmPrint] = useState(false);
 
   // Show the number this bill will be given, so the printed slip and the
   // register agree. Previously the receipt always printed "Bill No: 0".
@@ -73,13 +75,13 @@ export default function BillingDashboard() {
     setDiscount(0);
   }, [cart]);
 
-  const printBill = useCallback(async () => {
-    if (!canPrint || saving) return;
+  // Record the bill. Nothing is stored before this: not when the bill is
+  // built, and not when the print dialog opens (a cancelled print looks the
+  // same to the page as a finished one, so the cashier confirms it printed).
+  const commitBill = useCallback(async (printed) => {
+    if (!canPrint || saving) return false;
     setSaving(true);
-
     try {
-      // Save first: a bill that printed but was never recorded is the one
-      // failure mode the cashier cannot recover from at the counter.
       const result = await saveBill({
         items: cart.lines,
         payment,
@@ -87,25 +89,42 @@ export default function BillingDashboard() {
         tableNo,
         discount: discountPercent,
       });
-
-      setBillNumber(result.billNumber);
-      setPrintedAt(new Date());
-      notify(`Bill #${result.billNumber} saved — ${rupees(result.bill?.total ?? total)}`, 'success');
-
-      // Let React paint the final number before the print dialog snapshots it.
-      await new Promise((resolve) => setTimeout(resolve, 60));
-      window.print();
-
-      notify(`Bill #${result.billNumber} printed — ${rupees(result.bill?.total ?? total)}`, 'success');
-
+      const amount = rupees(result.bill?.total ?? total);
+      notify(`Bill #${result.billNumber} ${printed ? 'printed and saved' : 'saved'} — ${amount}`, 'success');
+      if (printed && billNumber && billNumber !== result.billNumber) {
+        notify(`The printed slip shows #${billNumber}, but another bill was saved first, so this one is #${result.billNumber} in the register.`, 'info');
+      }
       reset();
+      setPrintedAt(null);
       refreshBillNumber();
+      return true;
     } catch (err) {
       notify(errorMessage(err, 'Could not save the bill'), 'error');
+      return false;
     } finally {
       setSaving(false);
     }
-  }, [canPrint, cart, discountPercent, notify, orderType, payment, refreshBillNumber, reset, saving, tableNo, total]);
+  }, [billNumber, canPrint, cart, discountPercent, notify, orderType, payment, refreshBillNumber, reset, saving, tableNo, total]);
+
+  const printBill = useCallback(async () => {
+    if (!canPrint || saving) return;
+    // Print with the number this bill will get; saving waits for the answer.
+    try {
+      setBillNumber(await fetchNextBillNumber());
+    } catch {
+      /* keep the number already shown */
+    }
+    setPrintedAt(new Date());
+    // Let React paint the number and time before the print dialog snapshots them.
+    await new Promise((resolve) => setTimeout(resolve, 60));
+    window.print();
+    setConfirmPrint(true);
+  }, [canPrint, saving]);
+
+  const notPrinted = useCallback(() => {
+    setConfirmPrint(false);
+    setPrintedAt(null);
+  }, []);
 
   const stamp = printedAt || new Date();
 
@@ -238,7 +257,10 @@ export default function BillingDashboard() {
 
         <div className="actions no-print">
           <button type="button" className="print" onClick={printBill} disabled={!canPrint || saving}>
-            {saving ? 'Saving…' : 'Print'}
+            Print
+          </button>
+          <button type="button" className="save-bill" onClick={() => commitBill(false)} disabled={!canPrint || saving}>
+            {saving && !confirmPrint ? 'Saving…' : 'Save'}
           </button>
           <button type="button" className="clear" onClick={reset} disabled={cart.isEmpty}>
             Clear
@@ -300,6 +322,33 @@ export default function BillingDashboard() {
             menu.reload();
           }}
         />
+      )}
+
+      {confirmPrint && (
+        <ModalShell title="Did the bill print?" onClose={notPrinted} busy={saving}>
+          <div className="modal-body">
+            <p className="print-confirm-text">
+              Bill #{billNumber ?? '–'} for {rupees(total)} is saved only if it printed.
+              If you cancelled the print, choose <b>Not printed</b>: the bill stays on
+              screen and nothing is saved.
+            </p>
+          </div>
+          <div className="modal-actions">
+            <button type="button" className="btn-cancel" onClick={notPrinted} disabled={saving}>
+              Not printed
+            </button>
+            <button
+              type="button"
+              className="btn-add"
+              disabled={saving}
+              onClick={async () => {
+                if (await commitBill(true)) setConfirmPrint(false);
+              }}
+            >
+              {saving ? 'Saving…' : 'Yes, save bill'}
+            </button>
+          </div>
+        </ModalShell>
       )}
 
       <button
