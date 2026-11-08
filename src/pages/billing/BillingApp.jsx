@@ -16,6 +16,7 @@ import {
   DeleteMenuModal,
   EditMenuModal,
 } from '../../components/settings';
+import { orderCategories } from '../../hooks/useMenu';
 import BillingDashboard from './BillingDashboard';
 
 // Analytics pulls in Chart.js, which the till itself never needs. Loading it
@@ -65,7 +66,7 @@ function BillingPortal() {
     if (!isAdmin) return;
     try {
       const [cats, menuItems] = await Promise.all([fetchCategories(), fetchMenuItems()]);
-      setCategories(cats);
+      setCategories(orderCategories(cats, menuItems));
       setItems(menuItems);
     } catch (err) {
       // The dashboard covers the menu grid; this fetch fills the settings
@@ -110,8 +111,8 @@ function BillingPortal() {
       {openModal === 'addCategory' && <AddCategoryModal {...modalProps} />}
       {openModal === 'deleteCategory' && <DeleteCategoryModal {...modalProps} categories={categories} items={items} />}
       {openModal === 'addMenu' && <AddMenuItemModal {...modalProps} categories={categories} />}
-      {openModal === 'editMenu' && <EditMenuModal {...modalProps} items={items} />}
-      {openModal === 'deleteMenu' && <DeleteMenuModal {...modalProps} items={items} />}
+      {openModal === 'editMenu' && <EditMenuModal {...modalProps} categories={categories} items={items} />}
+      {openModal === 'deleteMenu' && <DeleteMenuModal {...modalProps} categories={categories} items={items} />}
     </div>
   );
 }

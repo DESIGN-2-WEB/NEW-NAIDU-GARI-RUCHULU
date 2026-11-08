@@ -289,11 +289,14 @@ export function AddMenuItemModal({ onClose, categories = [], onRefresh }) {
   );
 }
 
-export function EditMenuModal({ onClose, items = [], onRefresh }) {
-  const itemCategories = useMemo(
-    () => [...new Set(items.map((i) => i.category).filter(Boolean))].sort(),
-    [items],
-  );
+/** The categories that hold at least one item, in menu order. */
+function categoriesInUse(categories, items) {
+  const used = new Set(items.map((i) => i.category).filter(Boolean));
+  return categories.filter((c) => used.has(c));
+}
+
+export function EditMenuModal({ onClose, categories = [], items = [], onRefresh }) {
+  const itemCategories = useMemo(() => categoriesInUse(categories, items), [categories, items]);
   const [activeCategory, setActiveCategory] = useState(itemCategories[0] || '');
   // Items are tracked by id: a rename keeps the same item selected.
   const [selectedId, setSelectedId] = useState('');
@@ -461,11 +464,8 @@ export function EditMenuModal({ onClose, items = [], onRefresh }) {
   );
 }
 
-export function DeleteMenuModal({ onClose, items = [], onRefresh }) {
-  const categories = useMemo(
-    () => [...new Set(items.map((i) => i.category).filter(Boolean))].sort(),
-    [items],
-  );
+export function DeleteMenuModal({ onClose, categories: allCategories = [], items = [], onRefresh }) {
+  const categories = useMemo(() => categoriesInUse(allCategories, items), [allCategories, items]);
 
   const [activeCategory, setActiveCategory] = useState(categories[0] || '');
   const [selected, setSelected] = useState(() => new Set());

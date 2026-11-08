@@ -33,7 +33,12 @@ def _ensure_category(name: str, user: dict) -> None:
     the admin can see - and delete - in the category dialog."""
     db.categories.update_one(
         {"name": name},
-        {"$setOnInsert": {"name": name, "createdAt": utc_now(), "createdBy": user.get("email", "unknown")}},
+        {"$setOnInsert": {
+            "name": name,
+            "position": _next_position(),
+            "createdAt": utc_now(),
+            "createdBy": user.get("email", "unknown"),
+        }},
         upsert=True,
     )
 
@@ -228,8 +233,16 @@ def delete_item(user, name):
 @roles_required(*ALL_STAFF)
 @handle_errors
 def list_categories(user):
-    names = [c["name"] for c in db.categories.find({}, {"_id": 0, "name": 1}).sort("name", 1)]
-    return ok({"categories": names})
+    """Categories in menu order: by their saved position, then by name (a
+    category without a position goes after the ones that have one)."""
+    rows = db.categories.find({}, {"_id": 0, "name": 1, "position": 1})
+    ordered = sorted(rows, key=lambda c: (c.get("position") is None, c.get("position") or 0, c["name"]))
+    return ok({"categories": [c["name"] for c in ordered]})
+
+
+def _next_position() -> int:
+    last = db.categories.find_one({"position": {"$type": "number"}}, sort=[("position", -1)])
+    return int(last["position"]) + 1 if last else 1
 
 
 @bp.post("/categories")
@@ -242,7 +255,12 @@ def create_category(user):
     if db.categories.find_one({"name": name}):
         return fail("Category already exists", 400)
 
-    db.categories.insert_one({"name": name, "createdAt": utc_now(), "createdBy": user.get("email", "unknown")})
+    db.categories.insert_one({
+        "name": name,
+        "position": _next_position(),
+        "createdAt": utc_now(),
+        "createdBy": user.get("email", "unknown"),
+    })
     logger.info("Category added: %s", name)
     return ok({"message": "Category added"}, 201)
 

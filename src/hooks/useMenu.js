@@ -3,6 +3,17 @@ import { fetchCategories, fetchMenuItems } from '../api';
 import { errorMessage } from '../api/client';
 
 /**
+ * The category tabs in menu order: the saved categories as the API orders
+ * them (by their position in the database), then any category only an item
+ * uses, so an item filed under a deleted category is still reachable.
+ */
+export function orderCategories(dbCategories, menuItems) {
+  const names = dbCategories.map((c) => String(c).trim().toLowerCase()).filter(Boolean);
+  const extra = menuItems.map((item) => item.category).filter((c) => c && !names.includes(c));
+  return [...new Set(names), ...[...new Set(extra)].sort()];
+}
+
+/**
  * Load the menu and its categories together.
  *
  * Categories come from the database rather than being derived from the items,
@@ -21,11 +32,7 @@ export default function useMenu() {
     try {
       const [menuItems, dbCategories] = await Promise.all([fetchMenuItems(), fetchCategories()]);
 
-      // Union of declared categories and any category an item actually uses,
-      // so an item filed under a deleted category is still reachable.
-      const names = new Set(dbCategories.map((c) => String(c).trim().toLowerCase()));
-      menuItems.forEach((item) => names.add(item.category));
-      const ordered = [...names].filter(Boolean).sort();
+      const ordered = orderCategories(dbCategories, menuItems);
 
       setItems(menuItems);
       setCategories(ordered);

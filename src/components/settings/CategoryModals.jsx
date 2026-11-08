@@ -76,7 +76,8 @@ export function DeleteCategoryModal({ onClose, categories = [], items = [], onRe
     }
     return map;
   }, [categories, items]);
-  const allCategories = useMemo(() => [...counts.keys()].sort(), [counts]);
+  // Already in menu order: the saved categories first, as the menu shows them.
+  const allCategories = useMemo(() => [...counts.keys()], [counts]);
 
   const [selected, setSelected] = useState(() => new Set());
   const [busy, setBusy] = useState(false);
