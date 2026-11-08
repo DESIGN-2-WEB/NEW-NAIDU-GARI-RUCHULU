@@ -9,6 +9,7 @@ recommendation.
 
 **Contents**
 
+- [8 Nov 2026 — Bills older than 15 months deleted automatically; menu cleared](#8-nov-2026--bills-older-than-15-months-deleted-automatically-menu-cleared)
 - [8 Nov 2026 — Management: restaurant details, users, My account](#8-nov-2026--management-restaurant-details-users-my-account)
 - [5–8 Nov 2026 — New login page, full printed menu, earnings by category, bills cleared](#58-nov-2026--new-login-page-full-printed-menu-earnings-by-category-bills-cleared)
 - [Summary](#summary)
@@ -25,6 +26,11 @@ recommendation.
 - [How to verify](#how-to-verify)
 
 ---
+
+## 8 Nov 2026 — Bills older than 15 months deleted automatically; menu cleared
+- **Asked:** bills older than 15 months should be deleted automatically. Done with a MongoDB TTL index on `bills.createdAt` (`bill_retention`, 457 days = 15 months), created by `db.ensure_bill_retention()` at start-up (`SETUP_VERSION` 3) and already applied to the live database. MongoDB's own background task deletes expired bills about once a minute, so unlike the old six-month deletion (removed 25 Oct) there is no cron job, secret or timer. Changing `BILL_RETENTION_DAYS` updates the index on the next start (`collMod`). Tested on a scratch database: bills 487 and 459 days old went within ~20 s; 426 days old and today's stayed. The live database had no bills older than that.
+- **Menu cleared on request:** all 188 menu items and 25 categories deleted (a copy was saved in `backups/` first).
+- **Gear menu:** Management is one item that opens the Management page directly.
 
 ## 8 Nov 2026 — Management: restaurant details, users, My account
 - **Asked:** a "Management" option in the settings to edit the owner's name, address, phone numbers and an optional GST number; add and delete users; a "My account" option to change passwords; "Address" instead of "Location"; check everything for hard-coded values and make it structured.

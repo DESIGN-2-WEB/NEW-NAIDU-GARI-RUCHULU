@@ -1,4 +1,5 @@
-"""One-time startup work: the database indexes.
+"""One-time startup work: the database indexes, including the one that
+deletes bills older than 15 months (``db.BILL_RETENTION_DAYS``).
 
 Nothing is seeded from the code: staff accounts, categories, the menu and the
 restaurant settings all live only in the database (accounts are added with
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 # once more. Until then a start only checks the marker (one read) instead of
 # re-creating the indexes - about a second saved on every cold start of the
 # API on Vercel.
-SETUP_VERSION = 2
+SETUP_VERSION = 3  # 3: automatic deletion of bills older than 15 months
 
 
 def warn_missing_passwords() -> None:

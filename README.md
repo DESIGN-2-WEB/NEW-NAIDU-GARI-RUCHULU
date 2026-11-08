@@ -344,8 +344,16 @@ together.
 
 ### Keeping bills
 
-Bills are kept until the admin deletes them (Analytics → Manage bill →
-**Permanently delete bills**); nothing is deleted automatically.
+Bills are **deleted automatically once they are older than 15 months**
+(457 days). MongoDB does this itself through a TTL index on the bill's date
+(`bill_retention`, created at start-up by `server/db.py`), checking about once
+a minute, so it needs no scheduled job and works the same on Vercel and on a
+computer. To keep bills longer or shorter, change `BILL_RETENTION_DAYS` in
+`server/db.py`; the next start applies it. Download the Excel report for a
+period before its bills reach that age if you need them afterwards.
+
+The admin can also delete a bill at any time (Analytics → Manage bill →
+**Permanently delete bills**).
 
 ### Excel report
 

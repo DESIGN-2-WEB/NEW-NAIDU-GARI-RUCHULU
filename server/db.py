@@ -36,6 +36,14 @@ _COLLECTIONS = {
 }
 
 
+# Bills are deleted automatically once they are older than this: 15 months
+# (15 x 30.44 days, rounded up). MongoDB does it itself through a TTL index
+# on ``createdAt`` - its background task runs about once a minute - so it
+# needs no scheduled job and works the same on Vercel and on a computer.
+BILL_RETENTION_DAYS = 457
+BILL_RETENTION_INDEX = "bill_retention"
+
+
 class DatabaseUnavailable(RuntimeError):
     """Raised when a request needs the database but the cluster is unreachable."""
 
@@ -88,12 +96,26 @@ def healthy() -> bool:
         return False
 
 
+def ensure_bill_retention() -> None:
+    """Create the TTL index that deletes bills older than BILL_RETENTION_DAYS,
+    or change its age limit if BILL_RETENTION_DAYS was changed."""
+    seconds = BILL_RETENTION_DAYS * 24 * 60 * 60
+    current = bills.index_information().get(BILL_RETENTION_INDEX)
+    if current is None:
+        bills.create_index([("createdAt", ASCENDING)], name=BILL_RETENTION_INDEX, expireAfterSeconds=seconds)
+        logger.info("Bills older than %d days are now deleted automatically", BILL_RETENTION_DAYS)
+    elif current.get("expireAfterSeconds") != seconds:
+        db.command("collMod", bills.name, index={"name": BILL_RETENTION_INDEX, "expireAfterSeconds": seconds})
+        logger.info("Bill retention changed to %d days", BILL_RETENTION_DAYS)
+
+
 def ensure_indexes() -> None:
     """Create the indexes the query patterns rely on. Safe to re-run."""
     if client is None:
         return
     try:
         bills.create_index([("createdAt", DESCENDING)])
+        ensure_bill_retention()
         bills.create_index([("token", DESCENDING)])
         bills.create_index([("deleted", ASCENDING), ("createdAt", DESCENDING)])
         users.create_index([("email", ASCENDING)], unique=True)
