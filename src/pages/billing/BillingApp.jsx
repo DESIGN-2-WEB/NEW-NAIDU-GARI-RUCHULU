@@ -7,6 +7,9 @@ import { useNotify } from '../../components/notifications/notification-context';
 import { RESTAURANT } from '../../config/settings';
 import RequireAuth from '../../components/auth/RequireAuth';
 import SharedHeader from '../../components/layout/SharedHeader';
+// Shared portal chrome (page shell, header, settings form fields); loaded
+// here so it keeps its place in the stylesheet order.
+import '../../styles/shared.css';
 import SharedLogin from '../../components/auth/SharedLogin';
 import { PORTALS } from '../../config/portals';
 import { ADMIN, ROLES, isAdmin } from '../../config/roles';
@@ -18,12 +21,13 @@ import {
   EditMenuModal,
 } from '../../components/settings';
 import { orderCategories } from '../../hooks/useMenu';
-import ManagementPage from './ManagementPage';
 import BillingDashboard from './BillingDashboard';
 
 // Analytics pulls in Chart.js, which the till itself never needs. Loading it
 // on demand keeps the billing screen's bundle small on the counter terminal.
 const AnalyticsDashboard = lazy(() => import('./analytics/AnalyticsDashboard'));
+// Management is opened now and then by the admin; load it on demand too.
+const ManagementPage = lazy(() => import('./ManagementPage'));
 
 const LOGIN_PATH = `${PORTALS.billing.path}/login`;
 
@@ -141,7 +145,9 @@ export default function BillingApp() {
         path="/management"
         element={
           <RequireAuth roles={ROLES} loginPath={LOGIN_PATH}>
-            <ManagementPage loginPath={LOGIN_PATH} />
+            <Suspense fallback={<p className="menu-message">Loading…</p>}>
+              <ManagementPage loginPath={LOGIN_PATH} />
+            </Suspense>
           </RequireAuth>
         }
       />

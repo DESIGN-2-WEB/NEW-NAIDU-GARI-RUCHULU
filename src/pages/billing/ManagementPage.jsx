@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { KeyRound, Store, Users } from 'lucide-react';
 import { getUser } from '../../api/session';
@@ -49,14 +49,6 @@ export default function ManagementPage({ loginPath }) {
   const requested = params.get('section');
   const active = sections.find((s) => s.id === requested) || sections[0];
   const [busy, setBusy] = useState(false);
-
-  // Restaurant details saved here change the header too.
-  const [, setSettingsVersion] = useState(0);
-  useEffect(() => {
-    const redraw = () => setSettingsVersion((v) => v + 1);
-    window.addEventListener('settings:changed', redraw);
-    return () => window.removeEventListener('settings:changed', redraw);
-  }, []);
 
   const open = (id) => {
     if (!busy) setParams({ section: id }, { replace: true });

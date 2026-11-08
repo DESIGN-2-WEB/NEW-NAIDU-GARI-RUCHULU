@@ -114,7 +114,7 @@ def run_smoke_test():
     check("cashier can read the menu", status == 200 and isinstance(items, list), f"{status}")
 
     status, data = call("GET", "/api/categories", token=cashier)
-    check("categories load", status == 200 and len(data.get("categories", [])) > 0)
+    check("categories load", status == 200 and isinstance(data.get("categories"), list))
 
     print("\n== settings ==")
     status, data = call("GET", "/api/settings")
@@ -129,12 +129,12 @@ def run_smoke_test():
     order_type = settings.get("orderTypes", ["Dine-in"])[0]
 
     print("\n== bill numbering & creation ==")
-    status, data = call("GET", "/api/next-bill-number", token=cashier)
-    expected_first = data.get("nextBillNumber")
+    status, data = call("GET", "/api/bill-number", token=cashier)
+    expected_first = data.get("billNumber")
     check("next bill number returns a positive integer", status == 200 and isinstance(expected_first, int) and expected_first > 0)
 
-    sample_items = [{"name": "Single Mandi", "price": 180, "qty": 1}]
-    status, data = call("POST", "/api/bills", token=cashier, body={
+    sample_items = [{"name": "Smoke Test Dosa", "price": 180, "qty": 1, "category": "Dosa"}]
+    status, data = call("POST", "/api/bill", token=cashier, body={
         "items": sample_items,
         "payment": payment,
         "orderType": order_type,
@@ -146,8 +146,9 @@ def run_smoke_test():
     first_id = first_bill.get("id")
     check("first bill created", status == 201 and first_id and first_number == expected_first, f"{first_number} vs {expected_first}")
     check("bill total computed correctly", first_bill.get("total") == 180)
+    check("bill keeps the item's category (lower case)", (first_bill.get("items") or [{}])[0].get("category") == "dosa")
 
-    status, data = call("POST", "/api/bills", token=cashier, body={
+    status, data = call("POST", "/api/bill", token=cashier, body={
         "items": sample_items,
         "payment": payment,
         "orderType": order_type,
@@ -160,14 +161,14 @@ def run_smoke_test():
     check("consecutive bill increments number", second_number == first_number + 1, f"{second_number} vs {first_number + 1}")
     check("discount applied (180 - 10% = 162)", second_bill.get("total") == 162)
 
-    status, _ = call("POST", "/api/bills", token=cashier, body={
+    status, _ = call("POST", "/api/bill", token=cashier, body={
         "items": [],
         "payment": payment,
         "orderType": order_type,
     })
     check("empty bill rejected", status == 400, str(status))
 
-    status, _ = call("POST", "/api/bills", token=cashier, body={
+    status, _ = call("POST", "/api/bill", token=cashier, body={
         "items": sample_items,
         "payment": "InvalidPaymentMethodXYZ",
         "orderType": order_type,
@@ -186,8 +187,20 @@ def run_smoke_test():
     status, _ = call("DELETE", f"/api/bill/{first_id}/permanent-delete", token=cashier)
     check("cashier cannot delete a bill", status == 403, str(status))
 
-    status, _ = call("DELETE", "/api/categories/mandi", token=cashier)
+    status, _ = call("DELETE", "/api/categories/custom", token=cashier)
     check("cashier cannot delete a category", status == 403, str(status))
+
+    print("\n== management ==")
+    status, _ = call("PUT", "/api/settings", token=cashier, body={"owner": "x"})
+    check("cashier cannot edit restaurant details", status == 403, str(status))
+    status, data = call("PUT", "/api/settings", token=admin, body={"gstNumber": "123"})
+    check("an invalid GST number is refused", status == 400, str(status))
+    status, _ = call("GET", "/api/users", token=cashier)
+    check("cashier cannot list accounts", status == 403, str(status))
+    status, data = call("GET", "/api/users", token=admin)
+    check("admin lists accounts", status == 200 and any(u.get("isYou") for u in data.get("users", [])))
+    status, _ = call("POST", "/api/auth/password", token=cashier, body={"currentPassword": "wrong", "newPassword": "whatever1"})
+    check("password change needs the current password", status == 400, str(status))
 
     print("\n== excel sales report ==")
     today = _date.today().isoformat()

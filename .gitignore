@@ -41,3 +41,6 @@ backups/
 
 # Browser-test output
 .playwright-mcp/
+
+# Local Claude Code settings
+.claude/

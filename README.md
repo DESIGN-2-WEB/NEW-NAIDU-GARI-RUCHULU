@@ -117,6 +117,21 @@ code.
 - **Install as an app** — the login page has an *Install* button that installs
   the portal with the restaurant logo. It disappears once installed.
 - **Dark and light theme** (gear menu → Theme).
+- **Restaurant typography** — the restaurant's name and the page and dialog
+  titles use Playfair Display, as on the login page; everything else uses
+  Inter for legibility at the counter. Both fonts are bundled with the app.
+
+### Performance
+
+- **Opens without waiting for the server.** The restaurant settings are kept
+  on each device after the first visit, so the first screen appears at once
+  while fresh settings load in the background (the API on Vercel can take a
+  few seconds to wake up after a quiet spell).
+- **Small first download.** The sign-in and billing screens load about 118 KB
+  of compressed JavaScript; the charting library (Analytics) and the
+  Management page are downloaded only when they are opened.
+- **No background jobs.** Old bills are removed by a database index rather
+  than a scheduled task.
 
 ## Tech stack
 
@@ -363,12 +378,13 @@ Roman, black only, a border on every cell, A4 with page numbers.
 
 ### Backups and logs
 
-- `backups/` — copies of records taken before a clean-up: `menu-*.json` (the
-  menu before it was rebuilt from the printed menu) and `bills-*.json` (the
-  test bills cleared before the shop started billing). Each is a plain JSON
-  copy of the database records.
+- `backups/` — a place for JSON copies of database records taken before a
+  large clean-up (none are kept at present). The folder is never uploaded.
 - `logs/` — `api.log` and `web.log` when the servers run in the background;
   deleted bills are recorded there.
+
+For a full backup of the restaurant's data, use MongoDB Atlas (Project →
+Backup), which keeps copies independent of this computer.
 
 ## Troubleshooting
 
@@ -413,9 +429,12 @@ src/                       React web app
   main.jsx, App.jsx        start-up and the billing routes
   api/                     client.js (Axios + sign-in), session.js (the stored sign-in), index.js (every API call)
   config/                  settings.js (restaurant settings from the API), portals.js, roles.js
-  styles/                  index.css (colours, layout, print), components.css, theme.js, typography.js
+  styles/                  index.css (colours, layout, print), components.css, shared.css (page shell, header,
+                           dialog fields), theme.js, typography.js (Inter + Playfair Display)
   hooks/                   useMenu, useCart, useNumberGuard, usePageTitle
-  components/              auth/, layout/, ui/, notifications/, menu/, modals/, receipt/, settings/, management/ (the Management sections)
+  components/              auth/ (login, route guard), layout/ (header, gear menu), ui/ (Select, popups, icons),
+                           notifications/, menu/ (menu grid, cardImage), modals/, receipt/,
+                           settings/ (menu and category dialogs), management/ (the Management sections)
   pages/                   billing/ (BillingApp routes, BillingDashboard, ManagementPage, analytics/)
   utils/                   format, install, zoom, sizes, download
 
@@ -506,8 +525,9 @@ Checks that bill numbers start again at 1 at midnight IST (and not at UTC
 midnight), that an old counter is handled, and that 20 counters billing at once
 get different numbers. Uses a scratch database that it drops afterwards.
 
-The smoke test walks the whole flow — sign-in, roles, menu, billing, the bill
-register, the Excel report and menu editing. It saves real bills, so run it
+The smoke test walks the whole flow — sign-in, roles, menu, the restaurant
+settings, billing (including item categories), the bill register,
+Management permissions, the Excel report and menu editing (38 checks). It saves real bills, so run it
 against a **separate test database**, never the shop's:
 
 1. Start a second API on a test database:

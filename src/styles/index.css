@@ -227,6 +227,8 @@ html[data-theme='light'] body {
  */
 :root {
   --font-ui: 'Inter Variable', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* The restaurant's name and titles (as on the login page). */
+  --font-display: 'Playfair Display Variable', Georgia, 'Times New Roman', serif;
   --fs-xs: 0.75rem;   /* 12 — fine print, meta */
   --fs-sm: 0.8125rem; /* 13 — buttons, labels */
   --fs-md: 0.9063rem; /* 14.5 — body, table cells */
@@ -3634,3 +3636,32 @@ header.header .header-icons,
 header.header .header-actions {
   margin-top: 0 !important;
 }
+
+/* ===== DISPLAY TYPE =====
+   The restaurant's name and the page / dialog titles use Playfair Display,
+   as on the login page; the tagline is small spaced capitals. Body text,
+   buttons and figures stay in Inter. */
+header.header .billing-portal-heading h1 {
+  font-family: var(--font-display) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  text-shadow: none !important;
+}
+header.header .billing-portal-heading h3 {
+  font-family: var(--font-ui) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.16em !important;
+  font-weight: 600 !important;
+  font-size: clamp(10px, 1.3vw, 12px) !important;
+  color: var(--gold-ink) !important;
+}
+.modal-header h2,
+.mgmt-panel-head h2,
+.report-section h3,
+.chart-title,
+.payment-breakdown h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+

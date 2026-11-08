@@ -32,7 +32,7 @@
   --lg-btn-ink: #2A1A0E;
   --lg-shadow: rgba(0, 0, 0, 0.45);
 
-  --lg-serif: 'Playfair Display Variable', Georgia, 'Times New Roman', serif;
+  --lg-serif: var(--font-display);
   --lg-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   width: 100%;

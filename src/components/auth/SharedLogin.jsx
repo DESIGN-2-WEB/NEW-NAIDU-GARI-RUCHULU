@@ -4,8 +4,6 @@ import {
   ArrowRight, ChartColumn, Check, ChevronDown, Clock, Eye, EyeOff, LoaderCircle,
   Lock, MapPin, Phone, ReceiptText, Star, User, Users, UtensilsCrossed,
 } from 'lucide-react';
-import '@fontsource-variable/playfair-display';
-import '@fontsource-variable/playfair-display/wght-italic.css';
 import { fetchLoginAccounts, login } from '../../api';
 import { errorMessage } from '../../api/client';
 import { clearSession, saveSession } from '../../api/session';
@@ -13,7 +11,6 @@ import { RESTAURANT } from '../../config/settings';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import InstallAppButton from '../layout/InstallAppButton';
 import { useNotify } from '../notifications/notification-context';
-import './SharedLogin.css';
 import './Login.css';
 
 /** Remembers which account last signed in on this device, to preselect it. */

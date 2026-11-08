@@ -40,13 +40,17 @@ export default defineConfig(({ mode }) => {
     },
 
     build: {
-      // Chart.js and the router change far less often than the portal code;
-      // splitting them lets the browser keep them cached across deploys.
+      // React and the other libraries change far less often than the portal
+      // code; splitting them lets the browser keep them cached across deploys.
+      // Chart.js is left out on purpose: it is only imported by the lazily
+      // loaded Analytics page, so it stays in that chunk and the login and
+      // billing pages never download it. (Forcing it into its own chunk made
+      // every page preload it.)
       rollupOptions: {
         output: {
           manualChunks(id) {
             if (!id.includes('node_modules')) return undefined;
-            if (id.includes('chart.js') || id.includes('react-chartjs-2')) return 'charts';
+            if (id.includes('chart.js') || id.includes('react-chartjs-2') || id.includes('@kurkle')) return undefined;
             if (id.includes('react') || id.includes('scheduler')) return 'react';
             return 'vendor';
           },

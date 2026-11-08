@@ -11,3 +11,7 @@
  */
 
 import '@fontsource-variable/inter';
+// Playfair Display: the restaurant's name and the titles (login page, page
+// headers, dialogs). Bundled like Inter, so it works offline too.
+import '@fontsource-variable/playfair-display';
+import '@fontsource-variable/playfair-display/wght-italic.css';

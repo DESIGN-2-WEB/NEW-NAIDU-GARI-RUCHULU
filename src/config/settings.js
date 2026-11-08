@@ -54,22 +54,38 @@ export function replaceSettings(settings) {
   window.dispatchEvent(new Event('settings:changed'));
 }
 
-/** Fetch the settings (falling back to this device's last copy). */
-export async function loadSettings() {
+function readCache() {
   try {
-    const settings = await fetchSettings();
-    apply(settings);
-    remember(settings);
-  } catch (err) {
-    let cached = null;
-    try {
-      cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
-    } catch {
-      cached = null;
-    }
-    if (!cached) throw err;
-    apply(cached);
+    return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+  } catch {
+    return null;
   }
+}
+
+/**
+ * Load the settings before the first screen.
+ *
+ * A device that has opened the app before has a copy: it is used at once, so
+ * the screen appears without waiting for the API (which can take a few
+ * seconds to wake up on Vercel), and fresh settings are fetched in the
+ * background; if they differ, open screens redraw. A first visit waits for
+ * the API.
+ */
+export async function loadSettings() {
+  const cached = readCache();
+  if (cached) {
+    apply(cached);
+    fetchSettings()
+      .then((fresh) => {
+        if (JSON.stringify(fresh) === JSON.stringify(cached)) return;
+        replaceSettings(fresh);
+      })
+      .catch(() => { /* offline or waking up: keep this device's copy */ });
+    return;
+  }
+  const settings = await fetchSettings();
+  apply(settings);
+  remember(settings);
 }
 
 /** `[{value,label}]` for the table dropdown, with an "unassigned" first row. */

@@ -1,7 +1,7 @@
-/* Styles shared beyond the login page: the portal shell and header, the
+/* Portal chrome shared by every page: the page shell and header, the
    settings dialogs' .form-group fields, and the "Install app" button (its
-   login-page look is refined in Login.css). The login layout itself is all
-   in Login.css. */
+   login-page look is refined in auth/Login.css). Imported by BillingApp just
+   before the login page, so its place in the stylesheet order is unchanged. */
 .page-shell {
   min-height: 100vh;
   display: flex;
