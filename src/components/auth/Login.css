@@ -179,9 +179,11 @@ html[data-theme='light'] .lg-page {
   color: var(--lg-cream);
 }
 
+/* Sits a short step below the contact details; the free space goes below
+   the feature cards, so the © line stays at the bottom. */
 .lg-hero {
-  margin-block: auto;
-  padding-block: clamp(6px, 3vh, 28px);
+  margin: clamp(14px, 3.5vh, 32px) 0 auto;
+  padding-bottom: clamp(6px, 2vh, 20px);
   max-width: 520px;
 }
 .lg-kicker {
