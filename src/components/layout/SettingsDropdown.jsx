@@ -79,15 +79,7 @@ export default function SettingsDropdown({
 
             {admin && (
               <>
-                <MenuGroup
-                  label="Management"
-                  open={openGroup === 'management'}
-                  onToggle={() => toggle('management')}
-                >
-                  <MenuItem onClick={run(() => openManagement('restaurant'))}>Restaurant details</MenuItem>
-                  <MenuItem onClick={run(() => openManagement('users'))}>Users</MenuItem>
-                  <MenuItem onClick={run(() => openManagement('account'))}>My account</MenuItem>
-                </MenuGroup>
+                <MenuItem onClick={run(() => openManagement('restaurant'))}>Management</MenuItem>
 
                 <div className="menu-divider" />
               </>
