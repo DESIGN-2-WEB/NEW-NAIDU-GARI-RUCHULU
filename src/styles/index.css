@@ -340,12 +340,6 @@ display:flex;
 position:relative;
 top:-8px
 }
-.menu-item[data-has-image]:before{
-background:linear-gradient(135deg,#00000059 0%,#00000073 100%)
-}
-.menu-item[data-has-image]:hover:before{
-background:linear-gradient(135deg,#0003 0%,#0000004d 100%)
-}
 .qty-controls{
 justify-content:center;
 align-items:center;
@@ -557,40 +551,6 @@ margin:4px 0 0;
 font-size:13px;
 font-weight:400
 }
-.login-container{
-flex:1;
-justify-content:center;
-align-items:center;
-width:100%;
-max-width:720px;
-margin:0 auto;
-padding:32px 20px 24px;
-display:flex
-}
-.login-box{
-background:linear-gradient(135deg, var(--panel) 0%, var(--card-bg) 100%);
-border:2px solid var(--gold-dark);
-border-radius:12px;
-width:100%;
-max-width:640px;
-padding:48px 48px 32px;
-box-shadow:0 8px 32px var(--shadow)
-}
-.login-header{
-text-align:center;
-margin-bottom:32px
-}
-.login-header h2{
-color:var(--gold);
-text-shadow:2px 2px 8px var(--hover-glow);
-margin:0 0 10px;
-font-size:26px
-}
-.login-header p{
-color:var(--muted);
-margin:0;
-font-size:14px
-}
 .form-group input,.form-group select{
 width:100%;
 color:var(--text-strong);
@@ -617,82 +577,6 @@ box-shadow:0 0 0 3px var(--focus)
 .form-group input::placeholder{
 color:var(--muted)
 }
-.login-btn{
-background:var(--primary);
-color:var(--accent-contrast);
-cursor:pointer;
-border:none;
-border-radius:6px;
-width:100%;
-margin-top:30px;
-padding:14px;
-font-size:16px;
-font-weight:700;
-transition:all .3s;
-box-shadow:0 4px 15px #2e7d324d
-}
-.login-btn:hover{
-transform:translateY(-2px);
-box-shadow:0 6px 20px #2e7d3266
-}
-.login-btn:active{
-transform:translateY(0)
-}
-.login-btn:disabled{
-opacity:.6;
-cursor:not-allowed;
-transform:none
-}
-.password-field{
-position:relative
-}
-.toggle-password{
-color:var(--gold-ink);
-cursor:pointer;
-background:0 0;
-border:none;
-padding:4px 6px;
-font-size:14px;
-line-height:1;
-position:absolute;
-top:50%;
-right:12px;
-transform:translateY(-50%)
-}
-.toggle-password:focus{
-outline:none
-}
-.loading-spinner{
-border:3px solid var(--hover-glow);
-border-top-color:var(--gold);
-vertical-align:middle;
-border-radius:50%;
-width:20px;
-height:20px;
-margin-left:10px;
-animation:.8s linear infinite spin;
-display:none
-}
-.loading-spinner.show{
-display:inline-block
-}
-.login-footer{
-text-align:center;
-color:var(--muted);
-background:linear-gradient(135deg, var(--header-grad-a) 0%, var(--header-grad-c) 100%);
-border-top:2px solid var(--hover-glow);
-width:100%;
-margin-top:18px;
-padding:12px 10px;
-font-size:11px
-}
-.login-footer b{
-color:var(--gold);
-font-weight:700
-}
-
-/* Light theme: this header is cream, so bright gold disappears. */
-html[data-theme='light'] header.header .header-brand-info h1{color:var(--gold-ink)}
 @media (width<=700px){
 .header-info{
 flex-direction:column;
@@ -1436,10 +1320,30 @@ inset:0
 background:linear-gradient(135deg,#2a2a2a66 0%,#3336 100%)
 }
 
-/* Light theme: menu cards are cream panels, not grey photo tiles. The scrim
-   keeps the dark item name and maroon price readable over any food photo. */
-html[data-theme='light'] .menu-item:before{
-background:linear-gradient(180deg,rgba(251,235,208,.35) 0%,rgba(251,235,208,.9) 22%,rgba(255,246,227,.9) 78%,rgba(255,246,227,.35) 100%)
+/* Light theme: a card without a photo is a plain cream panel with dark text. */
+html[data-theme='light'] .menu-item:not([data-has-image]):before{
+background:none
+}
+
+/* Photo cards, both themes: the photo stays clear, and the name and price sit
+   on a dark band along the bottom so they read over any picture. */
+.menu-item[data-has-image]{
+justify-content:flex-end;
+padding-bottom:12px
+}
+html .menu-item[data-has-image]:before{
+background:linear-gradient(180deg,rgba(18,9,3,0) 28%,rgba(18,9,3,.55) 60%,rgba(18,9,3,.88) 100%)
+}
+html .menu-item[data-has-image]:hover:before{
+background:linear-gradient(180deg,rgba(18,9,3,0) 38%,rgba(18,9,3,.5) 66%,rgba(18,9,3,.85) 100%)
+}
+html .menu-item[data-has-image] .item-name{
+color:#FFF6E0;
+text-shadow:0 1px 3px rgba(0,0,0,.75)
+}
+html .menu-item[data-has-image] .item-price{
+color:#F3CF7E;
+text-shadow:0 1px 3px rgba(0,0,0,.75)
 }
 .menu-item:active{
 transform:scale(.97)
@@ -3144,8 +3048,7 @@ justify-content:center!important
   font-weight: 800;
   letter-spacing: -0.01em;
 }
-.page-footer b,
-.login-footer b {
+.page-footer b {
   font-size: var(--fs-xs);
   font-weight: 600;
   opacity: 0.75;

@@ -61,6 +61,7 @@ function MenuCard({ item, onSelect }) {
     <button
       type="button"
       className="menu-item"
+      data-has-image={image ? '' : undefined}
       style={image ? { backgroundImage: `url('${image}')` } : undefined}
       onClick={() => onSelect(item)}
     >
