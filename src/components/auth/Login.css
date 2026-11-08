@@ -1,0 +1,731 @@
+/* Login page: split layout.
+ * Left: the brand panel in the menu card's deep red with gold linework.
+ * Right: the sign-in form on a calm surface that follows the light/dark theme.
+ * Every class is prefixed `lg-` so nothing here leaks into the portal pages. */
+
+.lg-page {
+  /* Brand panel (same in both themes) */
+  --lg-red-1: #2C0506;
+  --lg-red-2: #5E0F10;
+  --lg-red-3: #7B1113;
+  --lg-gold: #E9B44C;
+  --lg-gold-soft: #F3CF7E;
+  --lg-cream: #FFF6E0;
+  --lg-cream-muted: rgba(255, 240, 214, 0.72);
+  --lg-glass: rgba(255, 240, 214, 0.06);
+  --lg-glass-line: rgba(233, 180, 76, 0.22);
+
+  /* Form side: dark wood theme */
+  --lg-surface: #24150B;
+  --lg-ink: #FFF6E0;
+  --lg-ink-soft: #C9AE87;
+  --lg-label: #D9BF94;
+  --lg-field: #33200F;
+  --lg-field-line: rgba(233, 180, 76, 0.28);
+  --lg-field-hover: rgba(233, 180, 76, 0.5);
+  --lg-focus: #E9B44C;
+  --lg-ring: rgba(233, 180, 76, 0.22);
+  --lg-menu: #2E1C0F;
+  --lg-menu-hover: rgba(233, 180, 76, 0.12);
+  --lg-btn-a: #E9B44C;
+  --lg-btn-b: #C9971F;
+  --lg-btn-ink: #2A1A0E;
+  --lg-shadow: rgba(0, 0, 0, 0.45);
+
+  --lg-serif: 'Playfair Display Variable', Georgia, 'Times New Roman', serif;
+  --lg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  width: 100%;
+  flex: 1;
+  /* One screen, no page scroll: the page is exactly the window's height and
+     the spacing below shrinks with it (vh units). */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  font-family: var(--font-ui);
+  background: var(--lg-surface);
+  color: var(--lg-ink);
+}
+
+html[data-theme='light'] .lg-page {
+  --lg-surface: #FBF6EC;
+  --lg-ink: #1E130A;
+  --lg-ink-soft: #7A6249;
+  --lg-label: #6B5640;
+  --lg-field: #FFFFFF;
+  --lg-field-line: #E6DAC3;
+  --lg-field-hover: #CDB98F;
+  --lg-focus: #C9971F;
+  --lg-ring: rgba(201, 151, 31, 0.2);
+  --lg-menu: #FFFFFF;
+  --lg-menu-hover: #FBF3E2;
+  --lg-btn-a: #6E1213;
+  --lg-btn-b: #4A0A0B;
+  --lg-btn-ink: #FFF6E0;
+  --lg-shadow: rgba(60, 30, 10, 0.16);
+}
+
+/* ===== Brand panel ===== */
+.lg-brand {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--lg-cream);
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(233, 180, 76, 0.10), transparent 55%),
+    radial-gradient(90% 70% at 100% 100%, rgba(139, 26, 26, 0.55), transparent 60%),
+    linear-gradient(160deg, var(--lg-red-2) 0%, var(--lg-red-1) 70%);
+}
+
+.lg-rosette {
+  position: absolute;
+  z-index: -1;
+  fill: none;
+  stroke: var(--lg-gold);
+  stroke-width: 0.6;
+  opacity: 0.3;
+  pointer-events: none;
+}
+.lg-rosette .lg-rosette-core {
+  stroke-width: 1.4;
+  opacity: 0.9;
+}
+.lg-rosette-a {
+  width: 210px;
+  height: 210px;
+  top: -70px;
+  left: -60px;
+  opacity: 0.32;
+  animation: lg-turn 140s linear infinite;
+}
+.lg-rosette-b {
+  width: min(78vh, 720px);
+  height: min(78vh, 720px);
+  right: -22%;
+  bottom: -28%;
+  opacity: 0.26;
+  animation: lg-turn 220s linear infinite reverse;
+}
+
+.lg-brand-inner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 1.2vh, 10px);
+  padding: clamp(18px, 5vh, 56px) clamp(24px, 4.5vw, 64px) clamp(16px, 4vh, 48px);
+}
+
+.lg-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.lg-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  object-fit: cover;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(233, 180, 76, 0.35);
+  background: var(--lg-cream);
+}
+.lg-name {
+  font-family: var(--lg-serif);
+  font-size: clamp(1.05rem, 0.8rem + 0.8vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.2px;
+}
+.lg-tagline {
+  margin-top: 3px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--lg-gold);
+}
+.lg-owner {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--lg-gold-soft);
+}
+
+.lg-hero {
+  margin-block: auto;
+  padding-block: clamp(6px, 3vh, 28px);
+  max-width: 520px;
+}
+.lg-kicker {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--lg-gold);
+}
+.lg-headline {
+  margin: clamp(6px, 1.6vh, 14px) 0 clamp(8px, 2vh, 18px);
+  font-family: var(--lg-serif);
+  font-size: min(clamp(2rem, 1.2rem + 2.6vw, 3.1rem), 7.2vh);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.5px;
+  color: var(--lg-cream);
+}
+.lg-headline em {
+  font-style: italic;
+  font-weight: 600;
+  color: var(--lg-gold);
+}
+.lg-contact {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2px, 0.8vh, 6px);
+  margin: 0 0 clamp(10px, 3vh, 26px);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--lg-cream-muted);
+}
+.lg-contact span {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.lg-contact svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--lg-gold);
+}
+
+.lg-features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(6px, 1.3vh, 10px);
+}
+.lg-feature {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: clamp(7px, 1.5vh, 12px) 16px;
+  border-radius: 14px;
+  background: var(--lg-glass);
+  border: 1px solid var(--lg-glass-line);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition:
+    transform 0.35s var(--lg-ease),
+    background-color 0.35s var(--lg-ease),
+    border-color 0.35s var(--lg-ease);
+}
+.lg-feature:hover {
+  transform: translateX(4px);
+  background: rgba(255, 240, 214, 0.1);
+  border-color: rgba(233, 180, 76, 0.42);
+}
+.lg-feature-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--lg-gold-soft);
+  box-shadow: inset 0 0 0 1px rgba(233, 180, 76, 0.25);
+}
+.lg-feature-title {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--lg-cream);
+}
+.lg-feature-text {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.76rem;
+  color: var(--lg-cream-muted);
+}
+
+.lg-credit {
+  font-size: 0.74rem;
+  color: var(--lg-cream-muted);
+  letter-spacing: 0.4px;
+}
+
+/* ===== Form side ===== */
+.lg-main {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: clamp(56px, 9vh, 72px) clamp(20px, 5vw, 64px) clamp(20px, 5vh, 48px);
+  /* Last resort on a very short window: only the form side scrolls. */
+  overflow-y: auto;
+}
+.lg-install {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+.lg-install:empty {
+  display: none;
+}
+.lg-install .install-app-btn {
+  border-radius: 10px;
+  border: 1px solid var(--lg-field-line);
+  background: var(--lg-field);
+  color: var(--lg-ink);
+  font-size: 0.8rem;
+  padding: 8px 14px;
+  box-shadow: 0 1px 2px var(--lg-shadow);
+  transition: border-color 0.25s var(--lg-ease), transform 0.25s var(--lg-ease), box-shadow 0.25s var(--lg-ease);
+}
+.lg-install .install-app-btn:hover:not(:disabled) {
+  background: var(--lg-field);
+  color: var(--lg-ink);
+  border-color: var(--lg-focus);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px var(--lg-shadow);
+}
+
+.lg-card {
+  width: 100%;
+  max-width: 400px;
+}
+.lg-title {
+  margin: 0;
+  font-family: var(--lg-serif);
+  font-size: clamp(1.9rem, 1.4rem + 1.2vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--lg-ink);
+}
+.lg-subtitle {
+  margin: 8px 0 34px;
+  font-size: 0.92rem;
+  color: var(--lg-ink-soft);
+}
+
+.lg-field {
+  margin-bottom: 20px;
+}
+/* Each animated field is its own stacking layer; keep the account list
+   above the password field that follows it. */
+.lg-field-account {
+  position: relative;
+  z-index: 5;
+}
+.lg-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--lg-label);
+}
+
+/* Shared look of the account picker and the password box */
+.lg-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 14px 0 16px;
+  border-radius: 12px;
+  border: 1px solid var(--lg-field-line);
+  background: var(--lg-field);
+  color: var(--lg-ink);
+  font: inherit;
+  font-size: 0.95rem;
+  box-shadow: 0 1px 2px var(--lg-shadow);
+  transition:
+    border-color 0.25s var(--lg-ease),
+    box-shadow 0.25s var(--lg-ease),
+    background-color 0.25s var(--lg-ease);
+}
+.lg-control:hover {
+  border-color: var(--lg-field-hover);
+}
+.lg-control:focus-within,
+.lg-picker.is-open .lg-control {
+  border-color: var(--lg-focus);
+  box-shadow: 0 0 0 4px var(--lg-ring);
+}
+.lg-control-icon {
+  flex-shrink: 0;
+  color: var(--lg-ink-soft);
+  transition: color 0.25s var(--lg-ease);
+}
+.lg-control:focus-within .lg-control-icon,
+.lg-picker.is-open .lg-control-icon {
+  color: var(--lg-focus);
+}
+
+/* Account picker */
+.lg-picker {
+  position: relative;
+}
+.lg-picker-button {
+  cursor: pointer;
+  text-align: left;
+}
+.lg-picker-button:focus-visible {
+  outline: none;
+  border-color: var(--lg-focus);
+  box-shadow: 0 0 0 4px var(--lg-ring);
+}
+.lg-picker-button:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+.lg-picker-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.lg-picker-value.is-placeholder {
+  color: var(--lg-ink-soft);
+  font-weight: 400;
+}
+.lg-chevron {
+  flex-shrink: 0;
+  color: var(--lg-ink-soft);
+  transition: transform 0.3s var(--lg-ease), color 0.25s;
+}
+.lg-picker.is-open .lg-chevron {
+  transform: rotate(180deg);
+  color: var(--lg-focus);
+}
+
+.lg-options {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border-radius: 14px;
+  background: var(--lg-menu);
+  border: 1px solid var(--lg-field-line);
+  box-shadow: 0 18px 40px var(--lg-shadow), 0 2px 6px var(--lg-shadow);
+  transform-origin: top center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(0.98);
+  transition:
+    opacity 0.2s var(--lg-ease),
+    transform 0.25s var(--lg-ease),
+    visibility 0s linear 0.25s;
+}
+.lg-picker.is-open .lg-options {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 0.2s var(--lg-ease),
+    transform 0.25s var(--lg-ease),
+    visibility 0s;
+}
+.lg-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.18s var(--lg-ease);
+}
+.lg-option.is-active {
+  background: var(--lg-menu-hover);
+}
+.lg-option-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(150deg, var(--lg-red-3), var(--lg-red-1));
+  color: var(--lg-gold-soft);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.lg-option-text {
+  flex: 1;
+  min-width: 0;
+}
+.lg-option-name {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--lg-ink);
+}
+.lg-option-role {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: capitalize;
+  color: var(--lg-ink-soft);
+}
+.lg-option-check {
+  flex-shrink: 0;
+  color: var(--lg-focus);
+}
+
+/* Password */
+.lg-password input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+.lg-password input::placeholder {
+  color: var(--lg-ink-soft);
+  opacity: 0.8;
+}
+/* Edge paints its own reveal eye in password boxes; ours is the only one. */
+.lg-password input::-ms-reveal,
+.lg-password input::-ms-clear {
+  display: none;
+}
+.lg-eye {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--lg-ink-soft);
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s;
+}
+.lg-eye:hover {
+  color: var(--lg-ink);
+  background: var(--lg-menu-hover);
+}
+.lg-eye:focus-visible {
+  outline: 2px solid var(--lg-focus);
+  outline-offset: 1px;
+}
+
+/* Sign in */
+.lg-submit {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 52px;
+  margin-top: 30px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--lg-btn-a), var(--lg-btn-b));
+  color: var(--lg-btn-ink);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px var(--lg-shadow);
+  transition:
+    transform 0.25s var(--lg-ease),
+    box-shadow 0.25s var(--lg-ease),
+    filter 0.25s var(--lg-ease);
+}
+/* A soft sheen that sweeps across on hover */
+.lg-submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.18) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.7s var(--lg-ease);
+}
+.lg-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px var(--lg-shadow);
+}
+.lg-submit:hover:not(:disabled)::after {
+  transform: translateX(120%);
+}
+.lg-submit:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+  transition-duration: 0.08s;
+}
+.lg-submit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--lg-ring), 0 8px 20px var(--lg-shadow);
+}
+.lg-submit:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.6);
+  opacity: 0.7;
+}
+.lg-submit-arrow {
+  transition: transform 0.3s var(--lg-ease);
+}
+.lg-submit:hover:not(:disabled) .lg-submit-arrow {
+  transform: translateX(4px);
+}
+
+.lg-helper {
+  margin-top: 18px;
+  font-size: 0.82rem;
+  color: var(--lg-ink-soft);
+  text-align: center;
+}
+
+/* Short laptop windows: drop the feature descriptions, tighten the form. */
+@media (min-width: 901px) and (max-height: 700px) {
+  .lg-feature-text {
+    display: none;
+  }
+  .lg-feature-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+  }
+  .lg-subtitle {
+    margin-bottom: 22px;
+  }
+  .lg-field {
+    margin-bottom: 14px;
+  }
+  .lg-submit {
+    margin-top: 20px;
+  }
+}
+@media (min-width: 901px) and (max-height: 540px) {
+  .lg-contact,
+  .lg-owner {
+    display: none;
+  }
+}
+
+/* ===== Motion ===== */
+.lg-reveal {
+  opacity: 0;
+  animation: lg-rise 0.7s var(--lg-ease) forwards;
+  animation-delay: calc(var(--d, 0) * 70ms + 80ms);
+}
+.lg-spin {
+  animation: lg-turn 0.8s linear infinite;
+}
+.lg-shake {
+  animation: lg-shake 0.42s var(--lg-ease);
+}
+
+@keyframes lg-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes lg-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes lg-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-page *,
+  .lg-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .lg-rosette {
+    animation: none !important;
+  }
+}
+
+/* ===== Tablets and phones: brand becomes a compact banner on top ===== */
+@media (max-width: 900px) {
+  .lg-page {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  .lg-brand-inner {
+    padding: 22px 20px 26px;
+    gap: 8px;
+  }
+  .lg-hero {
+    margin: 0;
+    padding: 14px 0 0;
+  }
+  .lg-headline {
+    margin: 8px 0 0;
+    font-size: clamp(1.55rem, 1.1rem + 2.2vw, 2rem);
+  }
+  .lg-contact,
+  .lg-features,
+  .lg-credit {
+    display: none;
+  }
+  .lg-rosette-b {
+    width: 360px;
+    height: 360px;
+    right: -120px;
+    bottom: -180px;
+  }
+  .lg-main {
+    padding: clamp(52px, 8vh, 64px) 20px clamp(16px, 3vh, 32px);
+  }
+  .lg-install {
+    top: 12px;
+    right: 14px;
+  }
+  .lg-subtitle {
+    margin-bottom: clamp(16px, 3vh, 26px);
+  }
+  .lg-field {
+    margin-bottom: clamp(12px, 2vh, 20px);
+  }
+  .lg-submit {
+    margin-top: clamp(16px, 3vh, 30px);
+  }
+}
+
+@media (max-width: 420px) {
+  .lg-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+  .lg-owner {
+    font-size: 0.76rem;
+  }
+  .lg-kicker {
+    letter-spacing: 2.4px;
+  }
+}
