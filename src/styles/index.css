@@ -1847,11 +1847,6 @@ cursor:not-allowed;
 transform:none;
 box-shadow:none
 }
-.print-confirm-text{
-margin:0;
-line-height:1.55;
-color:var(--modal-ink, var(--text))
-}
 .clear{
 background:linear-gradient(135deg, #c62828 0%, var(--red) 100%);
 color:var(--danger-contrast);
