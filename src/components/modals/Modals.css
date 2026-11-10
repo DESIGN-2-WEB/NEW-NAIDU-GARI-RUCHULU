@@ -136,19 +136,29 @@
   border-top: 1px solid var(--modal-line);
 }
 
-/* Dialogs whose markup has no .modal-body wrapper scroll as a whole but keep
-   the action row pinned with sticky positioning. */
+/* Dialogs whose markup has no .modal-body wrapper: the form itself is the
+   scroll area and the action row is pinned to its bottom. The form must
+   scroll - when only the card scrolled, the form was squeezed to the card's
+   height while its fields overflowed it, so the "sticky" row sat part-way
+   down the fields with inputs showing below the buttons. The padding (offset
+   by the negative margin) keeps input focus rings from being clipped. */
 .modal-content > form {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
-  margin: -6px 0 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding: 4px 4px 0;
+  margin: -4px -4px 0;
 }
 
+/* z-index keeps the row above positioned content scrolling under it (the
+   live-preview card's name and price sit at z-index 1). */
 .modal-content > form > .modal-actions {
   position: sticky;
-  bottom: -6px;
+  bottom: 0;
+  z-index: 2;
   background: var(--modal-bg);
 }
 .btn-cancel, .btn-add {

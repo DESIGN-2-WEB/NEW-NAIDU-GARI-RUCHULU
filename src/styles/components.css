@@ -153,7 +153,10 @@
   width: 100%;
 }
 
+/* isolation keeps the card's layered name/price inside the card, so they
+   cannot paint over a dialog's sticky Save/Close row. */
 .menu-item-preview {
+  isolation: isolate;
   pointer-events: none;
   margin: 0;
   width: 100%;
