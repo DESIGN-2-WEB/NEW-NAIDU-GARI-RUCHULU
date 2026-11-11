@@ -153,60 +153,81 @@
   flex-wrap: wrap;
   align-items: center;
 }
+/* The period buttons match the billing page's category tabs: solid accent
+   (maroon in the light theme) with cream text, and the selected one in the
+   same bright gold as the selected category tab. */
 .date-btn {
-  background: var(--card-bg);
-  color: var(--text);
-  border: 1px solid var(--gold-dark);
-  padding: 12px 20px;
-  border-radius: 6px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border: none;
+  padding: 0 20px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  transition: all 0.15s ease;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
   white-space: nowrap;
   height: 42px;
   display: flex;
   align-items: center;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 4px 12px rgba(212, 160, 23, 0.3);
+}
+.date-btn:not(.active) {
+  opacity: 0.88;
 }
 .date-btn:hover {
+  opacity: 1;
   transform: translateY(-2px);
-  border-color: var(--gold);
-  color: var(--danger-contrast);
+  box-shadow: 0 6px 16px rgba(212, 160, 23, 0.5);
 }
 .date-btn:active {
   transform: scale(0.97);
 }
-.date-btn.active {
-  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 100%);
-  color: var(--gold-contrast);
-  border-color: var(--gold);
-  box-shadow: 0 4px 12px rgba(255,213,79,0.3);
+.date-btn:focus-visible {
+  outline: 2px solid var(--gold-dark);
+  outline-offset: 2px;
 }
+.date-btn.active {
+  background: #ffd54f;
+  color: var(--gold-contrast);
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(255, 179, 0, 0.45);
+}
+/* Date fields: a cream field with an accent label chip, the same height and
+   corner radius as the buttons above. */
 .calendar-picker-wrapper {
   display: flex;
   align-items: center;
   background: var(--card-bg);
-  border: 1px solid var(--gold-dark);
-  border-radius: 6px;
-  height: 36px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  height: 42px;
   overflow: hidden;
   box-shadow: 0 2px 8px var(--shadow);
+  transition: box-shadow 0.15s ease;
+}
+.calendar-picker-wrapper:hover,
+.calendar-picker-wrapper:focus-within {
+  box-shadow: 0 0 0 3px var(--focus);
 }
 .calendar-label {
-  color: var(--gold-ink);
-  font-size: 11px;
+  color: var(--accent-contrast);
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.4px;
   white-space: nowrap;
-  padding: 0 12px;
-  background: var(--scroll-track);
+  padding: 0 14px;
+  background: var(--accent);
   height: 100%;
   display: flex;
   align-items: center;
-  border-right: 1px solid var(--gold-dark);
+  border-right: none;
 }
 .custom-date-input {
   padding: 0 12px;
@@ -447,8 +468,9 @@
   background: transparent;
   border: none;
   border-radius: 0;
-  padding: 0 12px;
-  font-size: 13px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 500;
   box-shadow: none !important;
   color: var(--text);
   cursor: pointer;
@@ -457,7 +479,10 @@
   justify-content: space-between;
 }
 .calendar-picker-wrapper .custom-date-picker-input:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--accent-soft);
+}
+.calendar-picker-wrapper .custom-date-picker-input svg {
+  color: var(--accent);
 }
 .custom-date-picker-input:hover {
   border-color: rgba(255, 215, 0, 0.3);
